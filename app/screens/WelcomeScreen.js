@@ -1,16 +1,14 @@
 import React from 'react';
 import { ImageBackground, StyleSheet, View, Pressable, Button, Dimensions, Alert, Image, Text, Linking } from 'react-native';
 
-const windowWidth = Dimensions.get('window').width;
-const windowHeight = Dimensions.get('window').height;
-
+const {height, width} = Dimensions.get("window");
 function WelcomeScreen(props) {
 
     return (
         
         <View style={styles.container}>
             <ImageBackground 
-                source={require('../assets/background2.jpg')} 
+                source={require('../assets/background.jpg')} 
                 resizeMode="cover" 
                 style={styles.background}>
 
@@ -38,7 +36,8 @@ function WelcomeScreen(props) {
 
                 <Pressable 
                     style={styles.GuestButton} 
-                    onPress={() => Alert.alert('Continue as Guest Button pressed')}>
+                    onPress={() => Alert.alert('Continue as Guest Button pressed')
+                    }>
                     <Text numberOfLines={1} style={styles.ContinueAsGuestText}>{"Continue as Guest"}</Text>
                 </Pressable> 
 
@@ -93,6 +92,7 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: "flex-end",
         alignItems: "center",
+
     },
 
     saveProgressText: {
@@ -135,8 +135,8 @@ const styles = StyleSheet.create({
         paddingHorizontal: 113,
         borderRadius: 8,
         elevation: 3,
-        backgroundColor: "#3D3C66",
-    
+        backgroundColor: "#555555", 
+        // "#3D3C66"
     },
 
     ContinueAsGuestText: {
