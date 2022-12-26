@@ -1,121 +1,241 @@
-import React from 'react';
-import { ImageBackground, StyleSheet, View, Pressable, Button, Dimensions, Alert, Image, Text, Linking } from 'react-native';
+import React, {useState} from 'react';
+import { ImageBackground, StyleSheet, View, Pressable, Image, Dimensions, Alert, Text, Linking, TextInput } from 'react-native';
+import Animated, {useSharedValue, useAnimatedStyle, interpolate, withTiming, withDelay} from 'react-native-reanimated';
 
 const {height, width} = Dimensions.get("window");
+
 function WelcomeScreen(props) {
+    const [showValue, setShowValue] = useState(false);  //used for close button animation
+
+    const imagePosition = useSharedValue(1); 
+
+    // elements sliding up animation
+    const imageAnimatedStyle = useAnimatedStyle(() => {
+        const interpolation = interpolate(imagePosition.value, [0,1], [-height/2 -20, 0])
+        return {
+            transform: [{translateY: withTiming(interpolation, {duration: 400})}]
+        }
+    })
+
+    const appNameAnimatedStyle = useAnimatedStyle(() => {
+        const interpolation = interpolate(imagePosition.value, [0,1], [-height/2 + 40, 0])
+        return {
+            transform: [{translateY: withTiming(interpolation, {duration: 400})}]
+        }
+    })
+
+    const bottomAnimatedStyle = useAnimatedStyle(() => {
+        const interpolation = interpolate(imagePosition.value, [0,1], [-height/2, 0])
+        return{
+            opacity: withTiming(imagePosition.value, {duration: 400}),
+            transform: [{translateY: withTiming(interpolation, {duration: 400})}]
+        }
+    })
+
+    // animation for closing the X button
+    const closeButtonAnimatedStyle = useAnimatedStyle(() => {
+        return {
+            opacity: withTiming(imagePosition.value === 1 ? 0 : 1, {duration: 500})
+
+        }
+    })
+
+    const formAnimatedStyle = useAnimatedStyle(() => {
+        return {
+            opacity: imagePosition.value === 0 ? withDelay(100, withTiming(1, {duration: 100})) : withTiming(0, {duration: 300})
+        }
+    })
+
+    // what happen when sign up button pressed
+    const LoginHandler = () => {
+        imagePosition.value = 0
+        setShowValue(!showValue)  // make close button appear
+    }
+
+    // what happen when close X button pressed
+    const closeButtonHandler = () => {
+        imagePosition.value = 1
+        setShowValue(!showValue)  // make close button disappear
+    }
 
     return (
-        
         <View style={styles.container}>
-            <ImageBackground 
-                source={require('../assets/background.jpg')} 
-                resizeMode="cover" 
-                style={styles.background}>
+            <Animated.View style = {[StyleSheet.absoluteFill, imageAnimatedStyle]}>
 
-                <Image 
-                    source = {require('../assets/taro.png')}
-                    style = {styles.logo} />
+                <ImageBackground 
+                    source={require('../assets/background.jpg')} 
+                    style={styles.background}
+                        >
 
+                    <Image 
+                        source = {require('../assets/taro.png')}
+                        style = {styles.logo} />  
+
+                </ImageBackground>
+            </Animated.View>
+
+            <Animated.View style = {[styles.appNameContainer, appNameAnimatedStyle]}>
                 <Image 
                     source = {require('../assets/positive.png')}
                     style = {styles.appName_positive} />
 
                 <Image 
                     source = {require('../assets/thoughtcard.png')}
-                    style = {styles.appName_thoughtcard} />     
+                    style = {styles.appName_thoughtcard} />   
 
+            </Animated.View>
+
+
+        <View style={styles.bottomContainer}>
+            <Animated.View style = {bottomAnimatedStyle}>  
                 <Text numberOfLines={1} style={styles.saveProgressText}> {"Sign up to save your progress!"}</Text>
-
-
-
+                
                 <Pressable 
-                    style={styles.signUpButton} 
-                    onPress={() => Alert.alert('SignUp Button pressed')}>
+                    style = {styles.signUpButton} 
+                    onPress= {() => Alert.alert('Sign up button pressed!')}>
+                                                            
                     <Text numberOfLines={1} style={styles.signUpButtonText}>{"Sign up"}</Text>
-                </Pressable>    
+                </Pressable>   
 
                 <Pressable 
                     style={styles.GuestButton} 
                     onPress={() => Alert.alert('Continue as Guest Button pressed')
+
                     }>
                     <Text numberOfLines={1} style={styles.ContinueAsGuestText}>{"Continue as Guest"}</Text>
                 </Pressable> 
-
+              
                 <Text numberOfLines={1} style={styles.logInText}> {"Already have an account?"}</Text>
                 <Text 
                     style={styles.logInLink}
-                    onPress={() => Linking.openURL('#')}> Log in
+                    onPress={LoginHandler}> Log in
                 </Text>
-                
-            </ImageBackground>
+                        
+            </Animated.View>
+
+            <Animated.View style = {[styles.closeButtonContainer, closeButtonAnimatedStyle]}> 
+                {showValue? <Text 
+                    style = {styles.closeButtonText}
+                    onPress = {closeButtonHandler} > {"\u2715"} 
+                </Text>: null}
+            </Animated.View>
+
+            <Animated.View style = {[styles.loginFormInputContainer, formAnimatedStyle]}>
+
+                <View style = {styles.logInToContinueContainer}> 
+                    <Text numberOfLines={1} style={styles.logInToContinueText}>
+                        Log in to continue your 
+                    </Text>
+
+                    <Text numberOfLines={1} style={styles.logInToContinueText}>
+                        progress
+                    </Text>
+                </View>
+
+                <TextInput placeholder='Email:' placeholderTextColor = "black" style = {styles.textInput}/>
+                <TextInput placeholder='Password:' placeholderTextColor="black" style = {styles.textInput}/>
+
+                <Pressable 
+                    style =  {styles.loginFormButton} 
+                    onPress={() => Alert.alert('SignUp Button pressed')}>
+                                                        
+                    <Text numberOfLines={1} style={styles.loginFormButtonText}>{"Log in"}</Text>
+                </Pressable>   
+
+                <Text numberOfLines={1} style={styles.forgotPassText}> {"Forgot your password?"}</Text>
+                <Text 
+                    style={styles.forgotPassLink}
+                    onPress={() => Linking.openURL('#')}> Reset password
+                </Text>
+
+                <Text numberOfLines={1} style={styles.signUpText}> {"Don't have an account?"}</Text>
+                <Text 
+                    style={styles.signUpLink}
+                    onPress={() => Linking.openURL('#')}> Sign up
+                </Text>
+
+            </Animated.View>
         </View>
-
-    // <ImageBackground 
-    // style = {styles.background}
-    // source = {require('../assets/background.jpg')}
-    // > 
-    //     <View> style = {styles.loginButton} </View>
-
-    // </ImageBackground> 
+    </View>    
     );
 }
 
-
 const styles = StyleSheet.create({
+    // Main welcome screen styles
+    // Styles for logo and app Name
     container: {
-        flex:1
+        flex:1,
+
+    },
+
+    background: {
+        justifyContent: "center",
+        alignItems: "center",
+        height: height,
+        width: width,
+        // borderBottomStartRadius: '50%',
+        // borderBottomEndRadius: '50%',
+        // overflow: 'hidden',
+        
     },
 
     logo: {
         width: 200,
         height: 200,
-        bottom: 150,
+        bottom: 190,
         alignItems: "center",
         
+    },
+
+    appNameContainer: {
+        flex: 1,
+        justifyContent: "flex-end",
+        alignItems: "center",
     },
 
     appName_positive: {
         width: 330,
         height: 70,
-        bottom: 47,
+        bottom: -140,  // *4
         resizeMode: "contain",
     },
 
     appName_thoughtcard: {
         width: 400,
         height: 70,
-        bottom: 73,
+        bottom: -115,  // *4
 
     },
 
-    background: {
+    // styles for remaining components on the main screen
+    bottomContainer: {
         flex: 1,
         justifyContent: "flex-end",
+        height: height/3,
         alignItems: "center",
-
+   
     },
 
     saveProgressText: {
-
+        alignSelf: "center",
         fontSize: 14,
         lineHeight: 21,
         fontWeight: 'bold',
         letterSpacing: 0.25,
         color: 'white',
-        bottom: 79,
+        bottom: 48,  //*2
 
     },
     signUpButton: {
         alignItems: 'center',
         justifyContent: 'center',
-        bottom: 57,
+        bottom: 27,  //*5
         paddingVertical: 12,
         paddingHorizontal: 154,
         borderRadius: 8,
         elevation: 3,
-        backgroundColor: "#2AB9E6",
-        
-    },
+        backgroundColor: "#2AB9E6",        
+        },
 
     signUpButtonText: {
 
@@ -126,17 +246,17 @@ const styles = StyleSheet.create({
         color: 'white',
     },
 
-
     GuestButton: {
         alignItems: 'center',
         justifyContent: 'center',
-        bottom: 49,
+        bottom: 18, // *5
         paddingVertical: 12,
-        paddingHorizontal: 113,
+        paddingHorizontal: 115,
         borderRadius: 8,
         elevation: 3,
-        backgroundColor: "#555555", 
-        // "#3D3C66"
+        backgroundColor: "#555555",
+        opacity: 0.8
+
     },
 
     ContinueAsGuestText: {
@@ -149,24 +269,152 @@ const styles = StyleSheet.create({
     },
 
     logInText: {
-
+        alignSelf: "center",
         fontSize: 11,
         lineHeight: 21,
         letterSpacing: 0.25,
         color: 'white',
         left: -28,
-        bottom: 30
+        bottom: 0
     },
 
     logInLink: {
+        alignSelf: "center",
         fontSize: 11,
         lineHeight: 21,
         color: '#2FB5E2',
         textDecorationLine: "underline",
         left: 85,
-        bottom: 57
+        bottom: 27
         
-    }
+    },
+
+    closeButtonContainer: {
+    
+        height: 30,
+        width: 30,
+        left: 160,
+        bottom: 675,
+        justifyContent: "center",
+        alignSelf: "center",
+        
+    },
+    closeButtonText:{
+        color: "white",
+        fontSize: 20,
+        fontWeight: 'bold',
+    
+    },
+
+    // Log in form styles
+
+    loginFormInputContainer: {
+        marginBottom: 50,
+        position: "absolute",
+        ...StyleSheet.absoluteFill,
+        zIndex: -1,
+        justifyContent: "center",
+    },
+
+    logInToContinueContainer: {
+        alignItems: "center"
+    },
+
+    logInToContinueText: {
+        fontSize: 14,
+        lineHeight: 17,
+        fontWeight: 'bold',
+        letterSpacing: 0.25,
+        color: 'white',
+        bottom: 114,
+    },
+
+    textInput: {
+    
+        height: 50,
+        fontSize: 12,
+        borderBottomColor: '#000000',
+        borderBottomWidth: 1,
+        paddingLeft: 0, // adjust placeholder position
+        // borderWidth: 1,
+        // borderColor: 'rgba(0,0,0,0.2 )',
+        // borderRadius: 25,
+        marginHorizontal: 15,   // adjust bottom input line position
+        marginVertical: 8,
+        bottom: 58,
+    },
+
+    loginFormButton:{
+        alignSelf: 'center',
+        justifyContent: 'center',
+        bottom: -114,
+        paddingVertical: 12,
+        paddingHorizontal: 154,
+        borderRadius: 8,
+        elevation: 3,
+        backgroundColor: "#2AB9E6",  
+        shadowColor: "black",
+        shadowOffset: {
+            width: 0,
+            height: 4,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 6,
+    },
+
+    loginFormButtonText: {
+
+        fontSize: 12,
+        lineHeight: 21,
+        fontWeight: 'bold',
+        letterSpacing: 0.25,
+        color: 'white',
+    },
+
+
+    forgotPassText: {
+        alignSelf: "center",
+        fontSize: 11,
+        lineHeight: 21,
+        letterSpacing: 0.25,
+        color: 'black',
+        left: -60,
+        bottom: 78
+    },
+
+    forgotPassLink: {
+        alignSelf: "center",
+        fontSize: 11,
+        lineHeight: 21,
+        color: '#2FB5E2',
+        textDecorationLine: "underline",
+        left: 80,
+        bottom: 104
+    },
+
+    signUpText: {
+        alignSelf: "center",
+        fontSize: 11,
+        lineHeight: 21,
+        letterSpacing: 0.25,
+        color: 'black',
+        left: -30,
+        bottom: 40
+    },
+
+    signUpLink: {
+        alignSelf:"center",
+        fontSize: 11,
+        lineHeight: 21,
+        color: '#2FB5E2',
+        textDecorationLine: "underline",
+        left: 85,
+        bottom: 66
+    },
+
+    // Sign up form style
+
 })
 
 export default WelcomeScreen;
