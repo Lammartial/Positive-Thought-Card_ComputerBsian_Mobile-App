@@ -1,32 +1,12 @@
 import React, {useState} from 'react';
-import { ImageBackground, StyleSheet, View, Pressable, Image, Dimensions, Alert, Text, Linking, TextInput} from 'react-native';
+import { ImageBackground, StyleSheet, View, Pressable, Image, Dimensions, Alert, Text, Linking, TextInput, KeyboardAvoidingView} from 'react-native';
 import Animated, {useSharedValue, useAnimatedStyle, interpolate, withTiming, withDelay} from 'react-native-reanimated';
 import CheckBox from 'expo-checkbox';
 import {Audio} from 'expo-av';
 
 const {height, width} = Dimensions.get("window");
 
-const buttonClickSounds = require('../assets/sound/finger_click.mp3')
-
 function WelcomeScreen(props) {
- 
-    const [sound, setSound] = React.useState();
-
-    async function playSound() {
-        const { sound } = await Audio.Sound.createAsync(require('../assets/sound/finger_click.mp3'));
-        setSound(sound);
-
-        await sound.playAsync();
-      }
-    
-      React.useEffect(() => {
-        return sound
-          ? () => {
-              sound.unloadAsync();
-            }
-          : undefined;
-      }, [sound]);
-
 
     const [showValue, setShowValue] = useState(false);  //used for close button animation
 
@@ -38,7 +18,22 @@ function WelcomeScreen(props) {
 
     const imagePosition = useSharedValue(1); 
 
-    // elements sliding up animation
+    // handle playing button click sound
+    const [sound, setSound] = React.useState();
+
+    async function playSound() {
+        const { sound } = await Audio.Sound.createAsync(require('../assets/sound/finger_click.mp3'));
+        setSound(sound);
+
+        await sound.playAsync();
+    }
+    
+        React.useEffect(() => {
+            return sound
+            ? () => {sound.unloadAsync();} : undefined;
+        }, [sound]);
+
+    // animation for sliding up elements
     const imageAnimatedStyle = useAnimatedStyle(() => {
         const interpolation = interpolate(imagePosition.value, [0,1], [-height/2 - 80, 0])
         return {
@@ -53,6 +48,7 @@ function WelcomeScreen(props) {
         }
     })
 
+    // handle animation for the remaining components of welcome screen apart from logo and app name
     const bottomAnimatedStyle = useAnimatedStyle(() => {
         const interpolation = interpolate(imagePosition.value, [0,1], [-height/2, 0])
         return{
@@ -69,6 +65,7 @@ function WelcomeScreen(props) {
         }
     })
 
+    // animation for showing login and signup form
     const formAnimatedStyle = useAnimatedStyle(() => {
         return {
             opacity: imagePosition.value === 0 ? withDelay(200, withTiming(1, {duration: 400})) : withTiming(0, {duration: 300})
@@ -77,6 +74,7 @@ function WelcomeScreen(props) {
 
     // what happen when log in link in main welcome screen pressed
     const LoginHandler = () => {
+        playSound();
         imagePosition.value = 0;
         setShowValue(!showValue)  // make close button appear
         if (isRegistering) {
@@ -98,6 +96,7 @@ function WelcomeScreen(props) {
     }
 
     const LoginLinkHandler = () => {
+        playSound();
         imagePosition.value = 0;
         if (isRegistering) {
             setIsRegistering(false);
@@ -105,6 +104,7 @@ function WelcomeScreen(props) {
     }
 
     const signUpLinkHandler = () => {
+        playSound();
         imagePosition.value = 0;
         if (!isRegistering){
             setIsRegistering(true);
@@ -113,6 +113,7 @@ function WelcomeScreen(props) {
 
     // what happen when close X button pressed
     const closeButtonHandler = () => {
+        playSound();
         imagePosition.value = 1
         setShowValue(!showValue)  // make close button disappear
         setEnabling();   // enable buttons and links when going back to welcome page
@@ -211,9 +212,11 @@ function WelcomeScreen(props) {
                         </Text>
                     </View>
 
-                    <TextInput editable={isDisabled} placeholder='Email:' placeholderTextColor = "black" style = {styles.textInput}/>
-                    <TextInput editable={isDisabled} placeholder='Password:' placeholderTextColor="black" style = {styles.textInput}/>
-
+                    <KeyboardAvoidingView behavior='padding'>   
+                        <TextInput editable={isDisabled} placeholder='Email:' placeholderTextColor = "black" style = {styles.textInput}/>
+                        <TextInput editable={isDisabled} placeholder='Password:' placeholderTextColor="black" style = {styles.textInput} secureTextEntry/>
+                    </KeyboardAvoidingView>
+ 
                     <Pressable 
                         style =  {styles.formButton} 
                         onPress={() => Linking.openURL('#')}>
@@ -250,11 +253,16 @@ function WelcomeScreen(props) {
                         </Text>
 
                     </View>
+                    
 
-                    <TextInput editable={isDisabled} placeholder='Username:' placeholderTextColor = "black" style = {[styles.textInput, {bottom: 85}]}/>
-                    <TextInput editable={isDisabled} placeholder='Email:' placeholderTextColor = "black" style = {[styles.textInput, {bottom: 85}]}/>
-                    <TextInput editable={isDisabled} placeholder='Password:' placeholderTextColor="black" style = {[styles.textInput, {bottom: 85}]}/>
+                    <KeyboardAvoidingView behavior='padding'>   
 
+                        <TextInput editable={isDisabled} placeholder='Username:' placeholderTextColor = "black" style = {[styles.textInput, {bottom: 85}]}/>
+                        <TextInput editable={isDisabled} placeholder='Email:' placeholderTextColor = "black" style = {[styles.textInput, {bottom: 85}]}/>
+                        <TextInput editable={isDisabled} placeholder='Password:' placeholderTextColor="black" style = {[styles.textInput, {bottom: 85}]} secureTextEntry/>
+
+                    </KeyboardAvoidingView>
+ 
                     <View style={styles.checkBoxContainer}>
                         <CheckBox
                         value={isSelected}
