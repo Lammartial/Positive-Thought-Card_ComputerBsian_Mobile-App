@@ -6,7 +6,28 @@ import {Audio} from 'expo-av';
 
 const {height, width} = Dimensions.get("window");
 
+const buttonClickSounds = require('../assets/sound/finger_click.mp3')
+
 function WelcomeScreen(props) {
+ 
+    const [sound, setSound] = React.useState();
+
+    async function playSound() {
+        const { sound } = await Audio.Sound.createAsync(require('../assets/sound/finger_click.mp3'));
+        setSound(sound);
+
+        await sound.playAsync();
+      }
+    
+      React.useEffect(() => {
+        return sound
+          ? () => {
+              sound.unloadAsync();
+            }
+          : undefined;
+      }, [sound]);
+
+
     const [showValue, setShowValue] = useState(false);  //used for close button animation
 
     const [isRegistering, setIsRegistering] = useState(false); // set state for when to login and sign up
@@ -66,7 +87,7 @@ function WelcomeScreen(props) {
 
     // what happen when sign up button pressed
     const signUpHandler = () => {
-
+        playSound();
         imagePosition.value = 0;
         setShowValue(!showValue)  // make close button appear
         if (!isRegistering){
@@ -190,8 +211,8 @@ function WelcomeScreen(props) {
                         </Text>
                     </View>
 
-                    <TextInput placeholder='Email:' placeholderTextColor = "black" style = {styles.textInput}/>
-                    <TextInput placeholder='Password:' placeholderTextColor="black" style = {styles.textInput}/>
+                    <TextInput editable={isDisabled} placeholder='Email:' placeholderTextColor = "black" style = {styles.textInput}/>
+                    <TextInput editable={isDisabled} placeholder='Password:' placeholderTextColor="black" style = {styles.textInput}/>
 
                     <Pressable 
                         style =  {styles.formButton} 
@@ -230,9 +251,9 @@ function WelcomeScreen(props) {
 
                     </View>
 
-                    <TextInput placeholder='Username:' placeholderTextColor = "black" style = {[styles.textInput, {bottom: 85}]}/>
-                    <TextInput placeholder='Email:' placeholderTextColor = "black" style = {[styles.textInput, {bottom: 85}]}/>
-                    <TextInput placeholder='Password:' placeholderTextColor="black" style = {[styles.textInput, {bottom: 85}]}/>
+                    <TextInput editable={isDisabled} placeholder='Username:' placeholderTextColor = "black" style = {[styles.textInput, {bottom: 85}]}/>
+                    <TextInput editable={isDisabled} placeholder='Email:' placeholderTextColor = "black" style = {[styles.textInput, {bottom: 85}]}/>
+                    <TextInput editable={isDisabled} placeholder='Password:' placeholderTextColor="black" style = {[styles.textInput, {bottom: 85}]}/>
 
                     <View style={styles.checkBoxContainer}>
                         <CheckBox
