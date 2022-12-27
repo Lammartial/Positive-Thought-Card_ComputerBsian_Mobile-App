@@ -1,5 +1,6 @@
 import React from 'react';
 import { ImageBackground, StyleSheet, View, Pressable, Button, Dimensions, Alert, Image, Text, Linking, Animated, SafeAreaView, TouchableOpacity } from 'react-native';
+// import FlipCard from 'react-native-flip-card';
 const {height, width} = Dimensions.get("window");
 
 function cardGen() {
@@ -52,18 +53,18 @@ const flipAnimation = () => {
 function Carddraw() {
     return (
         <ImageBackground
-        source={require('../assets/themedraw.jpg')} 
+        source={require('../assets/images/themedraw.jpg')} 
         resizeMode="cover" 
         style={styles.background}>
         <SafeAreaView style={styles.container}>
         <Animated.Image
-        source = {require('../assets/card_back.jpg')}
+        source = {require('../assets/images/card_back.jpg')}
         style = {[rotateYAnimatedStyle, styles.card_back]}/>
         <TouchableOpacity
         style = {styles.buttonStyle}
         onPress = {flipAnimation}>
         <Animated.Image
-        source = {require('../assets/card_front.jpg')}
+        source = {require('../assets/images/card_front.jpg')}
         style = {[rotateYAnimatedStyle, styles.card_front]}/>
         </TouchableOpacity>
 
@@ -87,6 +88,7 @@ const styles = StyleSheet.create({
         top: 140,
         alignItems: "center",
         backgroundColor:"transparent",
+        
     },
     card_front: {
         backfaceVisibility: "hidden",
