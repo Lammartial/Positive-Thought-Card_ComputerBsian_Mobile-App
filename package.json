@@ -11,10 +11,11 @@
   "dependencies": {
     "@react-native-community/checkbox": "^0.5.14",
     "@react-native-community/hooks": "^2.8.1",
-    "expo": "~47.0.8",
-    "expo-av": "^13.0.2",
+    "expo": "^47.0.0",
+    "expo-av": "~13.0.2",
     "expo-checkbox": "~2.2.2",
     "expo-status-bar": "~1.4.2",
+    "galio-framework": "^0.8.0",
     "react": "18.1.0",
     "react-dom": "18.1.0",
     "react-native": "0.70.5",
@@ -25,7 +26,7 @@
     "react-native-svg": "13.4.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.12.9"
+    "@babel/core": "^7.19.3"
   },
   "private": true
 }
