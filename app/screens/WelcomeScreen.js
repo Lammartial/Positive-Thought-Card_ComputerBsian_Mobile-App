@@ -1,8 +1,10 @@
-import React, {useState} from 'react';
-import { ImageBackground, StyleSheet, View, Pressable, Image, Dimensions, Alert, Text, Linking, TextInput, KeyboardAvoidingView} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import { ImageBackground, StyleSheet, View, Image, Dimensions, Alert, Text, Linking, TextInput, KeyboardAvoidingView, TouchableOpacity} from 'react-native';
 import Animated, {useSharedValue, useAnimatedStyle, interpolate, withTiming, withDelay} from 'react-native-reanimated';
 import CheckBox from 'expo-checkbox';
 import {Audio} from 'expo-av';
+import { auth } from '../../firebase';
+import { useNavigation } from '@react-navigation/native';
 
 const {height, width} = Dimensions.get("window");
 
@@ -18,11 +20,65 @@ function WelcomeScreen(props) {
 
     const imagePosition = useSharedValue(1); 
 
+    // handle user info
+
+    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+
+    // handle firebase database for login and signup
+
+    const navigation = useNavigation();
+
+    useEffect(() => {
+        const unsubscribe = auth.onAuthStateChanged(user => {
+            if (user){
+                navigation.navigate("Home")
+            }
+        })
+        return unsubscribe 
+    }, [])
+
+    const firebaseGuest = () => {
+        playSound();
+        auth
+            .signInAnonymously();
+            
+    }
+
+    const firebaseLogIn = () => {
+        playSound();
+        auth
+            .signInWithEmailAndPassword(email, password)
+            .then(userCredentials => {
+                const user = userCredentials?.user;
+                console.log('Logged in with', user .email)
+            })
+                .catch(error => {alert(error.message)});
+    }
+    
+    const firebaseSignUp = () => {
+        playSound();
+        auth    
+          .createUserWithEmailAndPassword(email, password)
+          .then(userCredentials => {
+            const user = userCredentials.user;
+            console.log('Signed up with', user?.email)
+            return userCredentials.user.updateProfile({
+              displayName: username
+            });
+          })
+          .catch(error => {
+            alert(error.message)
+            ;
+          });
+    };
+
     // handle playing button click sound
     const [sound, setSound] = React.useState();
 
     async function playSound() {
-        const { sound } = await Audio.Sound.createAsync(require('../assets/sound/finger_click.mp3'));
+        const { sound } = await Audio.Sound.createAsync(require('../assets/sound/finger-snap.mp3'));
         setSound(sound);
 
         await sound.playAsync();
@@ -163,22 +219,23 @@ function WelcomeScreen(props) {
             <Animated.View style = {bottomAnimatedStyle}>  
                 <Text numberOfLines={1} style={styles.saveProgressText}> {"Sign up to save your progress!"}</Text>
                 
-                <Pressable 
+                <TouchableOpacity 
                     disabled = {isDisabled}   // state of button
+                    activeOpacity={0.9} 
                     style = {styles.signUpButton} 
                     onPress= {signUpHandler}>
                                                             
                     <Text numberOfLines={1} style={styles.signUpButtonText}>{"Sign up"}</Text>
-                </Pressable>   
+                </TouchableOpacity>   
 
-                <Pressable 
+                <TouchableOpacity
                     disabled = {isDisabled}   // state of button
+                    activeOpacity={0.8} 
                     style={styles.GuestButton}
-                    onPress = {() => Alert.alert("Guest button pressed!")}>
-
+                    onPress = {firebaseGuest}>
 
                     <Text numberOfLines={1} style={styles.ContinueAsGuestText}>{"Continue as Guest"}</Text>
-                </Pressable> 
+                </TouchableOpacity> 
               
                 <Text numberOfLines={1} style={styles.logInText}> {"Already have an account?"}</Text>
                 
@@ -199,6 +256,7 @@ function WelcomeScreen(props) {
 
             {/* Creating login and sign up form */}
 
+            {/* show log in form when isRegistering = false  */}
             {!isRegistering && (
                 <Animated.View style = {[styles.loginFormInputContainer, formAnimatedStyle]}>
 
@@ -213,16 +271,32 @@ function WelcomeScreen(props) {
                     </View>
 
                     <KeyboardAvoidingView behavior='padding'>   
-                        <TextInput editable={isDisabled} placeholder='Email:' placeholderTextColor = "black" style = {styles.textInput}/>
-                        <TextInput editable={isDisabled} placeholder='Password:' placeholderTextColor="black" style = {styles.textInput} secureTextEntry/>
+                        <TextInput 
+                            editable={isDisabled} 
+                            placeholder='Email:' 
+                            placeholderTextColor = "black" 
+                            value = {email} 
+                            onChangeText = {setEmail} 
+                            style = {styles.textInput}/>
+
+                        <TextInput 
+                            editable={isDisabled} 
+                            placeholder='Password:' 
+                            placeholderTextColor="black" 
+                            value = {password} 
+                            onChangeText = {setPassword} 
+                            style = {styles.textInput} secureTextEntry/>
+
                     </KeyboardAvoidingView>
- 
-                    <Pressable 
+                    <TouchableOpacity
+                        
+                        activeOpacity={0.8}    
                         style =  {styles.formButton} 
-                        onPress={() => Linking.openURL('#')}>
+                        onPress={firebaseLogIn}>
                                                             
                         <Text numberOfLines={1} style={styles.formButtonText}>{isRegistering ? "Sign up": "Log in"}</Text>
-                    </Pressable>   
+ 
+                    </TouchableOpacity>
 
                     <Text numberOfLines={1} style={styles.forgotPassText}> {"Forgot your password?"}</Text>
                     <Text 
@@ -240,6 +314,7 @@ function WelcomeScreen(props) {
                 </Animated.View>
             )}
 
+            {/* show sign up form when isRegistering = true  */}
             {isRegistering && (
                 <Animated.View style = {[styles.loginFormInputContainer, formAnimatedStyle]}>
 
@@ -254,12 +329,31 @@ function WelcomeScreen(props) {
 
                     </View>
                     
-
                     <KeyboardAvoidingView behavior='padding'>   
 
-                        <TextInput editable={isDisabled} placeholder='Username:' placeholderTextColor = "black" style = {[styles.textInput, {bottom: 85}]}/>
-                        <TextInput editable={isDisabled} placeholder='Email:' placeholderTextColor = "black" style = {[styles.textInput, {bottom: 85}]}/>
-                        <TextInput editable={isDisabled} placeholder='Password:' placeholderTextColor="black" style = {[styles.textInput, {bottom: 85}]} secureTextEntry/>
+                        <TextInput 
+                            editable={isDisabled} 
+                            placeholder='Username:' 
+                            placeholderTextColor = "black" 
+                            value = {username} 
+                            onChangeText={setUsername} 
+                            style = {[styles.textInput, {bottom: 85}]}/>
+
+                        <TextInput 
+                            editable={isDisabled} 
+                            placeholder='Email:' 
+                            placeholderTextColor = "black"
+                            value = {email} 
+                            onChangeText = {setEmail}  
+                            style = {[styles.textInput, {bottom: 85}]}/>
+
+                        <TextInput 
+                            editable={isDisabled} 
+                            placeholder='Password:' 
+                            placeholderTextColor="black" 
+                            value = {password} 
+                            onChangeText = {setPassword} 
+                            style = {[styles.textInput, {bottom: 85}]} secureTextEntry/>
 
                     </KeyboardAvoidingView>
  
@@ -278,12 +372,13 @@ function WelcomeScreen(props) {
                         onPress={LoginLinkHandler}> Log in
                     </Text>
 
-                    <Pressable 
+                    <TouchableOpacity
+                        activeOpacity={0.8} 
                         style =  {[styles.formButton, {bottom: 34, paddingHorizontal: 154}]} 
-                        onPress={() => Linking.openURL('#')}>
+                        onPress={firebaseSignUp}>
                                                             
                         <Text numberOfLines={1} style={styles.formButtonText}>{isRegistering ? "Sign up": "Log in"}</Text>
-                    </Pressable>   
+                    </TouchableOpacity>   
 
                 </Animated.View>
             )}
@@ -389,7 +484,7 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         elevation: 3,
         backgroundColor: "#555555",
-        opacity: 0.8
+        opacity: 0.9
 
     },
 
@@ -595,4 +690,5 @@ const styles = StyleSheet.create({
 })
 
 export default WelcomeScreen;
+
 
