@@ -1,30 +1,37 @@
 import React from 'react';
-import { ImageBackground, StyleSheet, View, Pressable, Button, Dimensions, Alert, Image, Text, Linking, Animated, SafeAreaView, TouchableOpacity } from 'react-native';
-// import FlipCard from 'react-native-flip-card';
+import { ImageBackground, StyleSheet, Dimensions, Animated, SafeAreaView, TouchableOpacity } from 'react-native';
 const {height, width} = Dimensions.get("window");
-
-function cardGen() {
-  var i = Math.floor(Math.random()*(cardgen.length));
-  message = '<h2 style = "color:Tomato;">' + cardgen[i].name + '</h2>';
-  message += cardgen[i].description + '</p>';
-  message += '<p style = "font-style: italic; font-size: 15px;text-align: right"> ' + cardgen[i].author + '</p>';
-  return message;
-}
-
 
 let animatedValue = new Animated.Value(0)
 let curentValue = 0
 animatedValue.addListener(({value}) => {
     curentValue = value
 })
-const setInterpolate = animatedValue.interpolate({
+const frontInterpolate = animatedValue.interpolate({
+    inputRange: [0, 180],
+    outputRange: ['0deg', '180deg']
+})
+const backInterpolate = animatedValue.interpolate({
     inputRange: [0, 180],
     outputRange: ['180deg', '360deg']
 })
 
-const rotateYAnimatedStyle = {
-    transform: [{ rotateY: setInterpolate}]
+const frontAnimatedStyle = {
+    transform: [{ rotateY: frontInterpolate}]
 }
+
+const backAnimatedStyle = {
+    transform: [{ rotateY: backInterpolate}]
+}
+
+const frontOpacity = animatedValue.interpolate({
+    inputRange: [89, 90],
+    outputRange: [1,0]
+})
+const backOpacity = animatedValue.interpolate({
+    inputRange: [89, 90],
+    outputRange: [0,1]
+})
 
 const flipAnimation = () => {
     if (curentValue >= 90) {
@@ -34,10 +41,7 @@ const flipAnimation = () => {
             friction: 20,
             perspective: 1000,
             useNativeDriver:false
-        }).start(() => {
-            
-        }
-        )
+        }).start()
     } else {
         Animated.spring(animatedValue, {
             toValue: 180,
@@ -46,9 +50,9 @@ const flipAnimation = () => {
             perspective: 1000,
             useNativeDriver: false,
         }).start()
-
     }
 }
+
 
 function Carddraw() {
     return (
@@ -59,13 +63,13 @@ function Carddraw() {
         <SafeAreaView style={styles.container}>
         <Animated.Image
         source = {require('../assets/images/card_back.jpg')}
-        style = {[rotateYAnimatedStyle, styles.card_back]}/>
+        style = {[frontAnimatedStyle, styles.card_back, {opacity: frontOpacity}]}/>
         <TouchableOpacity
         style = {styles.buttonStyle}
         onPress = {flipAnimation}>
         <Animated.Image
         source = {require('../assets/images/card_front.jpg')}
-        style = {[rotateYAnimatedStyle, styles.card_front]}/>
+        style = {[backAnimatedStyle, styles.card_front, {opacity: backOpacity}]}/>
         </TouchableOpacity>
 
         </SafeAreaView>
@@ -80,13 +84,14 @@ const styles = StyleSheet.create({
     container: {
         flex:1
     },
-
+    hidden: {backfaceVisibility: "hidden"},
     card_back: {
         width: 330,
         height: 540,
         bottom: 0,
         top: 140,
         alignItems: "center",
+        onPress: 'hidden',
         backgroundColor:"transparent",
         
     },
@@ -97,7 +102,8 @@ const styles = StyleSheet.create({
         bottom: 0,
         top: 0,
         alignItems: "center",
-        backgroundColor:"transparent"
+        backgroundColor:"transparent",
+
     },
     
 
