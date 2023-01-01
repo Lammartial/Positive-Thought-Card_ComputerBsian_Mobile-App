@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react';
-import { ImageBackground, StyleSheet, View, Image, Dimensions, Alert, Text, Linking, TextInput, KeyboardAvoidingView, TouchableOpacity} from 'react-native';
+import { ImageBackground, StyleSheet, View, Image, Dimensions, Alert, Text, Linking, TextInput, KeyboardAvoidingView, TouchableOpacity, Easing} from 'react-native';
+import {Animated as Animation} from 'react-native';
 import Animated, {useSharedValue, useAnimatedStyle, interpolate, withTiming, withDelay} from 'react-native-reanimated';
 import CheckBox from 'expo-checkbox';
 import {Audio} from 'expo-av';
@@ -14,11 +15,54 @@ function WelcomeScreen(props) {
 
     const [isRegistering, setIsRegistering] = useState(false); // set state for when to login and sign up
 
-    const [isSelected, setSelection] = useState(false); // set state for check box
+    const [isSelected, setSelection] = useState(true); // set state for check box
 
     const [isDisabled, setIsDisabled] = useState(false); // set state for disabling buttons and links when another view is placed on top
 
     const imagePosition = useSharedValue(1); 
+
+    // rotating logo back and forth animation
+    const rotateValueHolder = new Animation.Value(0)
+
+    const rotation = rotateValueHolder.interpolate({
+        inputRange: [0,1],
+        outputRange: ['-15deg', '10deg']
+    })
+
+    const startImageRotateAnimation = () => {
+        Animation.loop(
+            Animation.sequence([
+              Animation.timing(rotateValueHolder, {
+                toValue: 1,
+                duration: 4000,
+                useNativeDriver: true,
+                easing: Easing.inOut(Easing.ease),
+              }),
+              Animation.timing(rotateValueHolder, {
+                toValue: 0,
+                duration: 4000,
+                useNativeDriver: true,
+                easing: Easing.inOut(Easing.ease),
+              }),
+            ]),
+          ).start();
+    }
+
+    // start rotating animation automatically
+    useEffect(() => {
+
+        startImageRotateAnimation();
+
+    }, [rotation]);
+
+    const logoRotatingStyle = {
+      transform: [
+        {
+          rotate: rotation,
+        },
+      ],
+    };
+
 
     // handle user info
 
@@ -30,19 +74,22 @@ function WelcomeScreen(props) {
 
     const navigation = useNavigation();
 
+    const [switchToHome, setSwitchToHome] = useState(false);
+
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged(user => {
-            if (user){
-                navigation.navigate("Home")
+            if (user && switchToHome){
+                navigation.navigate("Main")
             }
         })
         return unsubscribe 
-    }, [])
+    }, [switchToHome])
 
     const firebaseGuest = () => {
         playSound();
         auth
             .signInAnonymously();
+            setSwitchToHome(true)
             
     }
 
@@ -64,13 +111,17 @@ function WelcomeScreen(props) {
           .then(userCredentials => {
             const user = userCredentials.user;
             console.log('Signed up with', user?.email)
+            alert("You have successfully signed up. Please log in to continue!")
             return userCredentials.user.updateProfile({
               displayName: username
             });
           })
+          .then(() => {
+                // Call the LoginHandler function after successful sign up
+                LoginHandler();
+          })
           .catch(error => {
-            alert(error.message)
-            ;
+            alert(error.message);
           });
     };
 
@@ -91,9 +142,17 @@ function WelcomeScreen(props) {
 
     // animation for sliding up elements
     const imageAnimatedStyle = useAnimatedStyle(() => {
-        const interpolation = interpolate(imagePosition.value, [0,1], [-height/2 - 80, 0])
+        const interpolation = interpolate(imagePosition.value, [0,1], [-height/2 - 70, 0])
         return {
             transform: [{translateY: withTiming(interpolation, {duration: 400})}]
+        }
+    })
+
+    const logoAnimatedStyle = useAnimatedStyle(() => {
+        const interpolation = interpolate(imagePosition.value, [0,1], [-height/2 - 80, 0])
+        return {
+            
+            transform: [{translateY: withTiming(interpolation, {duration: 400})}],  
         }
     })
 
@@ -116,8 +175,8 @@ function WelcomeScreen(props) {
     // animation for closing the X button
     const closeButtonAnimatedStyle = useAnimatedStyle(() => {
         return {
+            // transform: [{rotate:rotation}],  // make the logo continue rotating back and forth after closing the X button
             opacity: withTiming(imagePosition.value === 1 ? 0 : 1, {duration: 500})
-
         }
     })
 
@@ -195,12 +254,15 @@ function WelcomeScreen(props) {
                 <ImageBackground 
                     source={require('../assets/images/background.jpg')} 
                     style={styles.background}>
-
-                    <Image 
-                        source = {require('../assets/images/taro.png')}
-                        style = {styles.logo} />  
-
+ 
                 </ImageBackground>
+            </Animated.View>
+
+            <Animated.View style = {[StyleSheet.absoluteFill, logoAnimatedStyle]}>
+                <Animation.Image 
+                        source = {require('../assets/images/taro.png')}
+                        style = {[styles.logo, logoRotatingStyle]} />  
+
             </Animated.View>
 
             <Animated.View style = {[styles.appNameContainer, appNameAnimatedStyle]}>
@@ -359,9 +421,11 @@ function WelcomeScreen(props) {
  
                     <View style={styles.checkBoxContainer}>
                         <CheckBox
+                        disabled={true}
                         value={isSelected}
                         onValueChange={setSelection}
-                        style={styles.checkBox}
+                        style={[styles.checkBox, {disabledText: "blue"}]}
+
                         />
                         <Text style={styles.checkBoxLabel}>By signing up, you agree to our <Text style = {styles.policyText} onPress={() => Linking.openURL('#')}>User Agreement</Text> and <Text style = {styles.policyText} onPress={() => Linking.openURL('#')}>Privacy Policy</Text></Text>
                     </View>
@@ -411,9 +475,9 @@ const styles = StyleSheet.create({
     logo: {
         width: 200,
         height: 200,
-        bottom: 190,
-        alignItems: "center",
-        
+        bottom: -80,
+        alignSelf: "center",
+   
     },
 
     appNameContainer: {
