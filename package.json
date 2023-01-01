@@ -9,12 +9,17 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@react-native-async-storage/async-storage": "^1.17.11",
     "@react-native-community/checkbox": "^0.5.14",
     "@react-native-community/hooks": "^2.8.1",
+    "@react-navigation/bottom-tabs": "^6.5.2",
+    "@react-navigation/native": "^6.1.1",
+    "@react-navigation/native-stack": "^6.9.7",
     "expo": "~47.0.8",
     "expo-av": "^13.0.2",
     "expo-checkbox": "~2.2.2",
     "expo-status-bar": "~1.4.2",
+    "firebase": "^8.2.3",
     "react": "18.1.0",
     "react-dom": "18.1.0",
     "react-native": "0.70.5",
@@ -22,7 +27,8 @@
     "react-native-hyperlink": "^0.0.22",
     "react-native-reanimated": "~2.12.0",
     "react-native-sound": "^0.11.2",
-    "react-native-svg": "13.4.0"
+    "react-native-svg": "13.4.0",
+    "react-native-vector-icons": "^9.2.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9"
