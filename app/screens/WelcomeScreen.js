@@ -21,6 +21,8 @@ function WelcomeScreen(props) {
 
     const imagePosition = useSharedValue(1); 
 
+    const resetFormPosition = useSharedValue(1); 
+
     // rotating logo back and forth animation
     const rotateValueHolder = new Animation.Value(0)
 
@@ -69,6 +71,8 @@ function WelcomeScreen(props) {
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+
+    const [resetEmail, setResetEmail] = useState('');  // email for reset password
 
     // handle firebase database for login and signup
 
@@ -125,6 +129,24 @@ function WelcomeScreen(props) {
           });
     };
 
+    // send reset password link to email
+    const [visible, setVisible] = useState(true);
+
+    const sendPasswordResetEmail = () => {
+        playSound();
+        auth
+          .sendPasswordResetEmail(resetEmail)
+          .then(() => {
+            setVisible(false)
+          })
+        
+          .catch(error => {
+            // Error occurred, inspect error.code
+            alert(error.message);
+
+          });
+      }
+
     // handle playing button click sound
     const [sound, setSound] = React.useState();
 
@@ -143,6 +165,14 @@ function WelcomeScreen(props) {
     // animation for sliding up elements
     const imageAnimatedStyle = useAnimatedStyle(() => {
         const interpolation = interpolate(imagePosition.value, [0,1], [-height/2 - 70, 0])
+        return {
+            transform: [{translateY: withTiming(interpolation, {duration: 400})}]
+        }
+    })
+
+    // animation for reset password form sliding up
+    const resetAnimatedStyle = useAnimatedStyle(() => {
+        const interpolation = interpolate(resetFormPosition.value, [0,1], [-565, 0])
         return {
             transform: [{translateY: withTiming(interpolation, {duration: 400})}]
         }
@@ -180,6 +210,14 @@ function WelcomeScreen(props) {
         }
     })
 
+    // animation for pressing the arrow left icon in the reset password form
+    const arrowLeftAnimatedStyle = useAnimatedStyle(() => {
+        return {
+            // transform: [{rotate:rotation}],  // make the logo continue rotating back and forth after closing the X button
+            opacity: withTiming(resetFormPosition.value === 1 ? 0 : 1, {duration: 500})
+        }
+    })
+
     // animation for showing login and signup form
     const formAnimatedStyle = useAnimatedStyle(() => {
         return {
@@ -196,6 +234,14 @@ function WelcomeScreen(props) {
             setIsRegistering(false);
         }
         setDisabling();  // disabling welcome screen link when navigating to log in form
+    }
+
+    // When reset password link pressed
+    const resetPassHandler = () => {
+        playSound();
+        resetFormPosition.value = 0;
+        setDisabling();  // disabling welcome screen buttons when navigating to sign up form
+
     }
 
     // what happen when sign up button pressed
@@ -230,9 +276,18 @@ function WelcomeScreen(props) {
     const closeButtonHandler = () => {
         playSound();
         imagePosition.value = 1
+        resetFormPosition.value = 1
         setShowValue(!showValue)  // make close button disappear
+        setVisible(true) // make reset password input and button appear
         setEnabling();   // enable buttons and links when going back to welcome page
 
+    }
+
+    // what happen when arrow left icon pressed
+    const arrowLeftHandler = () => {
+        playSound();
+        resetFormPosition.value = 1
+        setVisible(true)
     }
 
     const setDisabling = () => {
@@ -363,7 +418,7 @@ function WelcomeScreen(props) {
                     <Text numberOfLines={1} style={styles.forgotPassText}> {"Forgot your password?"}</Text>
                     <Text 
                         style={styles.forgotPassLink}
-                        onPress={() => Linking.openURL('#')}> Reset password
+                        onPress={resetPassHandler}> Reset password
                     </Text>
 
                     <Text numberOfLines={1} style={styles.navigateFormText}> {"Don't have an account?"}</Text>
@@ -373,7 +428,59 @@ function WelcomeScreen(props) {
                         onPress={signUpLinkHandler}> Sign up
                     </Text>
 
+                    {/* Reset Password Form */}
+
+                    <Animated.View style = {[StyleSheet.absoluteFill, styles.resetPasswordForm, resetAnimatedStyle]}>
+
+                        <Animated.View style = {arrowLeftAnimatedStyle}>
+                            <Text style = {styles.arrowLeftIcon}
+                                onPress = {arrowLeftHandler}>
+                                &#x2190;
+                            </Text>
+                        </Animated.View>
+
+                        {/* <Text numberOfLines={1} style={styles.formButtonText}>{isRegistering ? "Sign up": "Log in"}</Text> */}
+
+                        <Text numberOfLines={1} style={styles.resetPasswordText}>
+                            {visible ? "Reset your password": "Check your email"}
+                        </Text>
+
+                        <Text numberOfLines={1} style={styles.resetPasswordDescription1}>
+                            {visible ? "Enter your email you used for creating your account and ": "We sent you an email. Follow the instruction to reset"}
+                        </Text>
+
+                        <Text numberOfLines={1} style={styles.resetPasswordDescription2}>
+                            {visible ? "we'll send you a link to reset your password": "your password and sign back in"}
+                        </Text>
+
+                        {visible && (
+                            <View>
+                            <TextInput 
+                                
+                                editable={isDisabled} 
+                                placeholder='Email:' 
+                                placeholderTextColor = "black" 
+                                value = {resetEmail} 
+                                onChangeText = {setResetEmail} 
+                                style = {styles.resetTextInput}/>
+
+                            <TouchableOpacity 
+                            
+                                disabled = {!isDisabled}   // state of button
+                                activeOpacity={0.9} 
+                                style = {[styles.formButton, {zIndex: -1, bottom: -148}]} 
+                                onPress= {sendPasswordResetEmail}>
+                                                                        
+                                <Text numberOfLines={1} style={styles.formButtonText}>{"Reset"}</Text>
+                            </TouchableOpacity>  
+                            
+                        </View> 
+                        )}
+                        
+                    </Animated.View>
                 </Animated.View>
+
+                
             )}
 
             {/* show sign up form when isRegistering = true  */}
@@ -445,6 +552,7 @@ function WelcomeScreen(props) {
                     </TouchableOpacity>   
 
                 </Animated.View>
+
             )}
 
 
@@ -660,6 +768,59 @@ const styles = StyleSheet.create({
         textDecorationLine: "underline",
         left: 85,
         bottom: 66
+    },
+
+    resetPasswordForm:{
+    
+        height: 700,
+        top: 370,  // -190 when sliding up
+        justifyContent: "flex-start",
+        backgroundColor: "white",
+        borderTopLeftRadius: '30%',
+        borderTopRightRadius: '30%',
+
+    },
+
+    resetPasswordText: {
+        top: 30,
+        fontWeight: "bold",
+        fontSize: 18,
+        paddingLeft: 20,
+        letterSpacing: 0.75,
+    },
+
+    resetPasswordDescription1: {
+        top: 45,
+        fontSize: 12,
+        paddingLeft: 20,
+
+    },
+
+    resetPasswordDescription2: {
+        top: 45,
+        fontSize: 12,
+        paddingLeft: 20,
+
+    },
+
+    resetTextInput: {
+        height: 57,
+        fontSize: 12,
+        borderBottomColor: '#000000',
+        borderBottomWidth: 1,
+        paddingLeft: 0, // adjust placeholder position
+        // borderWidth: 1,
+        // borderColor: 'rgba(0,0,0,0.2 )',
+        // borderRadius: 25,
+        marginHorizontal: 15,   // adjust bottom input line position
+        marginVertical: 8,
+        bottom: -102,
+    },
+
+    arrowLeftIcon: {
+        top: 20,
+        paddingLeft: 24,
+        fontSize: 22,
     },
 
     // Sign up form style
