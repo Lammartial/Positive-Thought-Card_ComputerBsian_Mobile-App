@@ -12,6 +12,7 @@ function HomeScreen(){
             .signOut()
             .then(() => {
                 navigation.replace("Welcome")
+
             })
             .catch(error => alert(error.message))
     }

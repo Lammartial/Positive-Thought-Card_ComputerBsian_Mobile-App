@@ -84,6 +84,8 @@ function WelcomeScreen(props) {
         const unsubscribe = auth.onAuthStateChanged(user => {
             if (user && switchToHome){
                 navigation.navigate("Main")
+                setSwitchToHome(false); // set it back to false to disallow going to home without logging in
+
             }
         })
         return unsubscribe 
@@ -104,6 +106,8 @@ function WelcomeScreen(props) {
             .then(userCredentials => {
                 const user = userCredentials?.user;
                 console.log('Logged in with', user .email)
+                setSwitchToHome(true)
+
             })
                 .catch(error => {alert(error.message)});
     }
