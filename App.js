@@ -1,6 +1,7 @@
 import React from 'react';
 import WelcomeScreen from './app/screens/WelcomeScreen';
 import MainContainer from './app/MainContainer';
+import CardScreen from './app/screens/CardScreen'
 
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
