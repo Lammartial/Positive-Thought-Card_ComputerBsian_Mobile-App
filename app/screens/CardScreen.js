@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { ImageBackground, StyleSheet, Dimensions, Animated, SafeAreaView, TouchableOpacity } from 'react-native';
+import { Easing } from 'react-native-reanimated';
+
 const {height, width} = Dimensions.get("window");
 
 let animatedValue = new Animated.Value(0)
@@ -39,7 +41,7 @@ const flipAnimation = () => {
             toValue: 0,
             tension: 10,
             friction: 20,
-            perspective: 1000,
+            duration: 1000,
             useNativeDriver:false
         }).start()
     } else {
@@ -47,14 +49,24 @@ const flipAnimation = () => {
             toValue: 180,
             tension: 10,
             friction: 20,
-            perspective: 1000,
+            duration: 1000,
             useNativeDriver: false,
         }).start()
     }
 }
 
 
+
 function CardDraw() {
+    const cardMotion = useRef(new Animated.Value(0)).current;
+    useEffect (() => {
+    Animated.timing(cardMotion, {
+        toValue: height + 100,
+        duration: 1500,
+        useNativeDriver: false,
+        easing: Easing.exp
+    }).start();
+}, []);
     return (
         <ImageBackground
         source={require('../assets/images/themedraw.jpg')} 
@@ -63,13 +75,13 @@ function CardDraw() {
         <SafeAreaView style={styles.container}>
         <Animated.Image
         source = {require('../assets/images/card_back.jpg')}
-        style = {[frontAnimatedStyle, styles.card_back, {opacity: frontOpacity}]}/>
+        style = {[frontAnimatedStyle, styles.card_back, {opacity: frontOpacity, marginTop: cardMotion}]}/>
         <TouchableOpacity
         style = {styles.buttonStyle}
         onPress = {flipAnimation}>
         <Animated.Image
         source = {require('../assets/images/card_front.jpg')}
-        style = {[backAnimatedStyle, styles.card_front, {opacity: backOpacity}]}/>
+        style = {[backAnimatedStyle, styles.card_front, {opacity: backOpacity, marginTop: cardMotion}]}/>
         </TouchableOpacity>
 
         </SafeAreaView>
@@ -82,26 +94,20 @@ function CardDraw() {
 
 const styles = StyleSheet.create({
     container: {
-        flex:1
+        flex:1,
     },
-    hidden: {backfaceVisibility: "hidden"},
+
     card_back: {
         width: 330,
         height: 540,
-        bottom: 0,
-        top: 140,
-        alignItems: "center",
-        onPress: 'hidden',
+        bottom: height,
         backgroundColor:"transparent",
         
     },
     card_front: {
-        backfaceVisibility: "hidden",
         width: 330,
         height: 540,
-        bottom: 0,
-        top: 0,
-        alignItems: "center",
+        bottom: height+140,
         backgroundColor:"transparent",
 
     },
@@ -109,8 +115,10 @@ const styles = StyleSheet.create({
 
     background: {
         flex: 1,
-        justifyContent: "flex-end",
+        justifyContent: "center",
         alignItems: "center",
+        height:height - 50,
+        width:width
 
     },
     buttonStyle: {
@@ -121,7 +129,7 @@ const styles = StyleSheet.create({
         backgroundColor: 'transparent',
         height: 540,
         width: 330,
-        bottom: 400
+        bottom: height
     },
     buttonTextStyle: {
         color: 'transparent',
