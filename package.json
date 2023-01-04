@@ -11,7 +11,7 @@
   "dependencies": {
     "@react-native-community/checkbox": "^0.5.14",
     "@react-native-community/hooks": "^2.8.1",
-    "expo": "^47.0.0",
+    "expo": "^47.0.9",
     "expo-av": "~13.0.2",
     "expo-checkbox": "~2.2.2",
     "expo-status-bar": "~1.4.2",
