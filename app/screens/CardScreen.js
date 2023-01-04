@@ -53,8 +53,8 @@ const flipAnimation = () => {
     }
 }
 
-
 function CardDraw() {
+
     return (
         <ImageBackground
         source={require('../assets/images/themedraw.jpg')} 
@@ -79,11 +79,11 @@ function CardDraw() {
     );
 }
 
-
 const styles = StyleSheet.create({
     container: {
         flex:1
     },
+
     hidden: {backfaceVisibility: "hidden"},
     card_back: {
         width: 330,
@@ -106,7 +106,6 @@ const styles = StyleSheet.create({
 
     },
     
-
     background: {
         flex: 1,
         justifyContent: "flex-end",
