@@ -1,6 +1,6 @@
 
 import React, { useEffect, useRef } from 'react';
-import { ImageBackground, StyleSheet, Dimensions, Animated, SafeAreaView, TouchableOpacity } from 'react-native';
+import { ImageBackground, StyleSheet, Dimensions, Animated, SafeAreaView, TouchableOpacity, Text, View } from 'react-native';
 import { Easing } from 'react-native-reanimated';
 
 const {height, width} = Dimensions.get("window");
@@ -126,7 +126,7 @@ const randomQuote = quotes[randomNumber];
         <Animated.Image
         source = {require('../assets/images/card_front.jpg')}
         style = {[backAnimatedStyle, styles.card_front, {opacity: backOpacity, marginTop: cardMotion}]}/>
-        <Animated.View style={[backAnimatedStyle, styles.card_front]}>
+        <Animated.View style={[backAnimatedStyle, styles.text_containter]}>
         {/* Wrap the Text component in a View component and apply the front animation styles */}
         <Text style={styles.quoteText}>{randomQuote}</Text>
         </Animated.View>
@@ -143,6 +143,15 @@ const styles = StyleSheet.create({
         flex:1,
     },
 
+    text_containter: {
+        width: 330,
+        height: 540,
+        bottom: height + 300,
+        backgroundColor:"transparent",
+        backfaceVisibility:"hidden"
+    },
+
+
     card_back: {
         width: 330,
         height: 540,
@@ -153,7 +162,7 @@ const styles = StyleSheet.create({
     card_front: {
         width: 330,
         height: 540,
-        bottom: height+140,
+        bottom: height-140,
         backgroundColor:"transparent",
 
     },
@@ -179,10 +188,12 @@ const styles = StyleSheet.create({
     },
     buttonTextStyle: {
         color: 'transparent',
-        fontSize: 20
+        fontSize: 20,
+        backfaceVisibility:"hidden",
     },
 
     quoteText: {
+        backfaceVisibility:"hidden",
         position: 'absolute',
         top: 0,
         left: 0,
