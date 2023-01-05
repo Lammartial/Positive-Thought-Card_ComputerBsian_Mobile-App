@@ -6,9 +6,9 @@ import { Easing } from 'react-native-reanimated';
 const {height, width} = Dimensions.get("window");
 
 let animatedValue = new Animated.Value(0)
-let curentValue = 0
+let currentValue = 0
 animatedValue.addListener(({value}) => {
-    curentValue = value
+    currentValue = value
 })
 const frontInterpolate = animatedValue.interpolate({
     inputRange: [0, 180],
@@ -110,20 +110,23 @@ const randomNumber = Math.floor(Math.random() * quotes.length);
 // Select a random quote from the quotes array
 const randomQuote = quotes[randomNumber];
 
-
     return (
         <ImageBackground
-        source={require('../assets/images/themedraw.jpg')} 
-        resizeMode="cover" 
-        style={styles.background}>
+            source={require('../assets/images/themedraw.jpg')} 
+            resizeMode="cover" 
+            style={styles.background}>
         <SafeAreaView style={styles.container}>
+            
         <Animated.Image
+
         source = {require('../assets/images/card_back.jpg')}
         style = {[frontAnimatedStyle, styles.card_back, {opacity: frontOpacity, marginTop: cardMotion}]}/>
+
         <TouchableOpacity
-        style = {styles.buttonStyle}
-        onPress = {flipAnimation}>
+            style = {styles.buttonStyle}
+            onPress = {flipAnimation}>
         <Animated.Image
+        
         source = {require('../assets/images/card_front.jpg')}
         style = {[backAnimatedStyle, styles.card_front, {opacity: backOpacity, marginTop: cardMotion}]}/>
         <Animated.View style={[backAnimatedStyle, styles.text_containter]}>
@@ -137,7 +140,6 @@ const randomQuote = quotes[randomNumber];
     );
 }
 
-
 const styles = StyleSheet.create({
     container: {
         flex:1,
@@ -150,7 +152,6 @@ const styles = StyleSheet.create({
         backgroundColor:"transparent",
         backfaceVisibility:"hidden"
     },
-
 
     card_back: {
         width: 330,
@@ -167,7 +168,6 @@ const styles = StyleSheet.create({
 
     },
     
-
     background: {
         flex: 1,
         justifyContent: "center",

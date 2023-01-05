@@ -9,9 +9,9 @@ import {
 } from "react-native";
 
 import { Block, Text, theme } from "galio-framework";
-import { Button } from "../another_test/components";
-import { Images, argonTheme } from "../another_test/constants";
-import { HeaderHeight } from "../another_test/constants/utils";
+import { Button } from "../../components"; 
+import { Images, argonTheme } from "../../constants";
+import { HeaderHeight } from "../../constants/utils";
 
 const { width, height } = Dimensions.get("screen");
 
@@ -152,7 +152,7 @@ class Profile extends React.Component {
                       View all
                     </Button>
                   </Block>
-                  {/* <Block style={{ paddingBottom: -HeaderHeight * 2 }}>
+                  <Block style={{ paddingBottom: -HeaderHeight * 2 }}>
                     <Block row space="between" style={{ flexWrap: "wrap" }}>
                       {Images.Viewed.map((img, imgIndex) => (
                         <Image
@@ -163,7 +163,7 @@ class Profile extends React.Component {
                         />
                       ))}
                     </Block>
-                  </Block> */}
+                  </Block>
                 </Block>
               </Block>
             </ScrollView>
