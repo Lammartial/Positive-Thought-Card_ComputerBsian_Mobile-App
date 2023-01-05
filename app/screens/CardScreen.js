@@ -162,7 +162,7 @@ const styles = StyleSheet.create({
     card_front: {
         width: 330,
         height: 540,
-        bottom: height-140,
+        bottom: height-130,
         backgroundColor:"transparent",
 
     },
