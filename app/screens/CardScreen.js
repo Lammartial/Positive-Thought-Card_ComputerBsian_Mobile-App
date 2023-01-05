@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef } from 'react';
 import { ImageBackground, StyleSheet, Dimensions, Animated, SafeAreaView, TouchableOpacity } from 'react-native';
 import { Easing } from 'react-native-reanimated';
@@ -56,7 +57,6 @@ const flipAnimation = () => {
 }
 
 
-
 function CardDraw() {
     const cardMotion = useRef(new Animated.Value(0)).current;
     useEffect (() => {
@@ -83,9 +83,8 @@ function CardDraw() {
         source = {require('../assets/images/card_front.jpg')}
         style = {[backAnimatedStyle, styles.card_front, {opacity: backOpacity, marginTop: cardMotion}]}/>
         </TouchableOpacity>
-
+        {/* <BorderEffect size={100}/> */}
         </SafeAreaView>
-    
         </ImageBackground>
 
     );
