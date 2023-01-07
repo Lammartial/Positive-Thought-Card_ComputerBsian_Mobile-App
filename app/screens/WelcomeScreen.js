@@ -1,11 +1,13 @@
 import React, {useEffect, useState} from 'react';
-import { ImageBackground, StyleSheet, View, Image, Dimensions, Alert, Text, Linking, TextInput, KeyboardAvoidingView, TouchableOpacity, Easing} from 'react-native';
+import { ImageBackground, StyleSheet, View, Image, Dimensions, Alert, Text, Linking, TextInput, KeyboardAvoidingView, TouchableOpacity, Easing, StatusBar} from 'react-native';
 import {Animated as Animation} from 'react-native';
 import Animated, {useSharedValue, useAnimatedStyle, interpolate, withTiming, withDelay} from 'react-native-reanimated';
 import CheckBox from 'expo-checkbox';
 import {Audio} from 'expo-av';
 import { auth } from '../../firebase';
+import { db } from '../../firebase';
 import { useNavigation } from '@react-navigation/native';
+// import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const {height, width} = Dimensions.get("window");
 
@@ -67,6 +69,20 @@ function WelcomeScreen(props) {
 
 
     // handle user info
+    const create_firestoreDatabase = () => {
+        db.collection("users").add({
+          username: username,
+          email: email,
+          password: password,
+          profile_image: ""
+        })
+        .then((docRef) => {
+            console.log("Document written with ID: ", docRef.id);
+        })
+        .catch((error) => {
+            console.error("Error adding document: ", error);
+        });
+      }
 
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
@@ -83,7 +99,7 @@ function WelcomeScreen(props) {
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged(user => {
             if (user && switchToHome){
-                navigation.navigate("Main")
+                navigation.replace("Main")
                 setSwitchToHome(false); // set it back to false to disallow going to home without logging in
 
             }
@@ -114,6 +130,7 @@ function WelcomeScreen(props) {
     
     const firebaseSignUp = () => {
         playSound();
+        create_firestoreDatabase()
         auth    
           .createUserWithEmailAndPassword(email, password)
           .then(userCredentials => {
@@ -155,7 +172,7 @@ function WelcomeScreen(props) {
     const [sound, setSound] = React.useState();
 
     async function playSound() {
-        const { sound } = await Audio.Sound.createAsync(require('../assets/sound/finger-snap.mp3'));
+        const { sound } = await Audio.Sound.createAsync(require('../assets/sound/button-click.mp3'));
         setSound(sound);
 
         await sound.playAsync();
@@ -307,11 +324,15 @@ function WelcomeScreen(props) {
     }
 
     return (
+        <>
+        {/* hide the status bar of device(time, wifi, etc.) */}
+        <StatusBar hidden />  
+
         <View style={styles.container}>
             <Animated.View style = {[StyleSheet.absoluteFill, imageAnimatedStyle]}>
 
                 <ImageBackground 
-                    source={require('../assets/images/background.jpg')} 
+                    source={require('../assets/images/background_1.jpg')} 
                     style={styles.background}>
  
                 </ImageBackground>
@@ -562,6 +583,7 @@ function WelcomeScreen(props) {
 
         </View>
     </View>    
+    </>
     );
 }
 
