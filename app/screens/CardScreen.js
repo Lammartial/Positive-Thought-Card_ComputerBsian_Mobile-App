@@ -186,7 +186,7 @@ function CardDraw() {
                {/* Wrap the Text component in a View component and apply the back animation styles */}
                {isVisible && (
 
-                    <Text style={[styles.quoteText, {fontSize: 22, fontWeight: "bold"}]}>{today}</Text>
+                    <Text style={[styles.quoteText, {fontSize: 22, fontWeight: "bold", color: "#fba0b5"}]}>{today}</Text>
                     )}
 
                     {/* display the quote more nicely */}
