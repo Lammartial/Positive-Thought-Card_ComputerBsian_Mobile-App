@@ -1,8 +1,9 @@
 import * as React from 'react';
-import { NavigationContainer} from '@react-navigation/native';
+import { NavigationContainer, useFocusEffect} from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import {Text} from 'react-native'
+import {Text, StatusBar} from 'react-native'
+import { Audio } from 'expo-av';
 
 // Screens
 import HomeScreen from './screens/HomeScreen';
@@ -14,11 +15,14 @@ const homeName = "Home";
 const cardName = "Card";
 const accountName = "Account";
 
-const Tab = createBottomTabNavigator();
+const Tab = createBottomTabNavigator(); 
 
 function MainContainer() {
         
   return (
+    <>
+    <StatusBar hidden /> 
+
       <Tab.Navigator
         initialRouteName={homeName}
         screenOptions={({ route }) => ({
@@ -67,6 +71,7 @@ function MainContainer() {
         <Tab.Screen name={accountName} component={AccountScreen} options = {{headerShown: false}} />
 
       </Tab.Navigator>
+      </>
   );
 }
 
