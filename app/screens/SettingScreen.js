@@ -6,6 +6,7 @@ import Animated, {interpolate} from 'react-native-reanimated';
 import Slider from '@react-native-community/slider';
 
 function SettingScreen() {
+
     const navigation = useNavigation()
 
     return (

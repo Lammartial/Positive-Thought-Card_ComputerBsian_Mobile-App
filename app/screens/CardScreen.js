@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { ImageBackground, StyleSheet, Dimensions, Animated, SafeAreaView, TouchableOpacity, Text, View } from 'react-native';
+import { ImageBackground, StyleSheet, Dimensions, Animated, SafeAreaView, TouchableOpacity, Text, View, Image } from 'react-native';
 import { Card } from 'react-native-elements'; 
-import { Easing } from 'react-native-reanimated';
+import { Easing,} from 'react-native-reanimated';
 
 const {height, width} = Dimensions.get("window");
 
@@ -62,15 +62,29 @@ function CardDraw() {
     }
 
     const cardMotion = useRef(new Animated.Value(0)).current;
-    useEffect (() => {
-        runCardAnimation();
-    }, []);
+    // useEffect (() => {
+    //     runCardAnimation();
+    // }, []);
+
+    // the above code automatically plays card animation from scratch
 
 
     const runCardAnimation = () => {
         setIsVisible(false)  // hide the quote when run the animation again
 
-        displayDrawButton() // reanimate the draw a new card button
+        setIsCardDeckVisible(false) // hide the card deck
+
+        setIsButtonDisabled(true) // disable draw card button
+
+        setIsButtonVisible(false); // hide the draw card button
+
+        setShowDrawAnimation(true)  // draw card animation visible
+
+        startAnimation();
+
+        // select a new card back image
+        const randomIndex = Math.floor(Math.random() * imageFiles.length);
+        setCurrentImage(imageFiles[randomIndex]);
 
         // reset cardMotion to original value after animation completes
         cardMotion.setValue(0);
@@ -81,39 +95,24 @@ function CardDraw() {
         // Select a random quote from the quotes array
         setRandomQuote(quotes[randomNumber]);
 
-        Animated.timing(cardMotion, {
-            toValue: height + 100,
-            duration: 1500,
-            useNativeDriver: false,
-            easing: Easing.exp
-        }).start();
+        setTimeout(() => {
+            Animated.timing(cardMotion, {
+                toValue: height + 150,
+                duration: 1500,
+                useNativeDriver: false,
+                easing: Easing.exp
+            }).start();
+        }, 1500);
 
     }
 
-        // handle animation for displaying the draw card button
-        const [drawButtonOpacity] = useState(new Animated.Value(0));
 
-        const displayDrawButton = () => {
-            // drawButtonOpacity.setValue(0)  --> in case we want to also make the draw button disappear
-    
-            const timeout = setTimeout(() => {
-                // code to be executed after the delay
-                Animated.timing(drawButtonOpacity, {
-                    toValue: 1,
-                    duration: 800,
-                    useNativeDriver: false,
-                  }).start();
-    
-              }, 3000); // delay in milliseconds (4000 = 4 seconds)
-    
-            return () => clearTimeout(timeout);
-        }
+    // handle animation for displaying the draw card button
+    const [isButtonVisible, setIsButtonVisible] = useState(true);
+    const [isButtonDisabled, setIsButtonDisabled] = useState(false)
 
-    useEffect(() => {
-        displayDrawButton();
-      }, []);
 
-      const quotes = ["TODAY I am loved. Today I start from the notion that I am profoundly loved. Whatever happens in my day, I know I'm loved.", 
+    const quotes = ["TODAY I am loved. Today I start from the notion that I am profoundly loved. Whatever happens in my day, I know I'm loved.", 
       "TODAY I look at the positive side. I purposefully look for the positive side of people, situations, events. And I also look at my positive sides.",
       "TODAY I am in touch with the magic of water.I will act as if the water were alive, I thank it for being the source of life and for constituting 65% of my body. I will be bonding with it all day.",
       "TODAY I forgive myself. I free myself from the weight of resentment. Today, and just for the day, I forgive myself.",
@@ -149,6 +148,14 @@ function CardDraw() {
     // choosing random quote
     const [randomQuote, setRandomQuote] = useState('')
 
+    // choosing random card back image 
+    const imageFiles = [
+        require('../assets/images/card_back.jpg'),
+        // add more images here as necessary
+    ];
+
+    const [currentImage, setCurrentImage] = useState(imageFiles[0]);
+
     // title TODAY of quote
     const today = randomQuote.substring(0, randomQuote.indexOf(' '))
 
@@ -162,60 +169,122 @@ function CardDraw() {
     // set where the quote is visible
     const [isVisible, setIsVisible] = useState(false);
 
+    // initial card deck
+    let card_deck = [];
+
+    for (let i = 0; i < 9; i++) {
+        card_deck.push(
+
+            <Animated.Image 
+            key={i}
+            source = {currentImage}
+            style = {styles.card_deck} 
+            />
+        )
+    }
+
+    // visibility of card animation
+    const [showDrawAnimation, setShowDrawAnimation] = useState(false);
+
+    // visibility of card deck
+    const [isCardDeckVisible, setIsCardDeckVisible] = useState(true);
+
+    // Card of the day text
+    const [viewOpacity] = useState(new Animated.Value(0));
+    const [animationRunning, setAnimationRunning] = useState(false);
+
+    // display text animation
+    const startAnimation = () => {
+        Animated.timing(viewOpacity, {
+            toValue: 1,
+            duration: 2000,
+            useNativeDriver: true,
+        }).start(() => setAnimationRunning(false));
+        setAnimationRunning(true);
+    };
+
     return (
         <ImageBackground
             source={require('../assets/images/themedraw.jpg')} 
             resizeMode="cover" 
             style={styles.background}>
         <SafeAreaView style={styles.container}>
+       
+        {isCardDeckVisible &&
+            <Animated.View style={styles.deck_container}>
+                {card_deck}
+            </Animated.View>
+        }
+
+        {/* draw card button */}
+
+        <Animated.View style = {[styles.drawButtonStyle]}>
             
-        <Animated.Image
+          {isButtonVisible && 
+          
+            <TouchableOpacity 
+              
+              disabled = {isButtonDisabled}
+              activeOpacity={0.8}    
+              style = {styles.drawCardButton}
+              onPress = {runCardAnimation} >
+                                                          
+              <Text numberOfLines={1} style={styles.drawCardButtonText}>{"Draw a new card"}</Text>
+  
+          </TouchableOpacity> }
 
-        source = {require('../assets/images/card_back.jpg')}
-        style = {[frontAnimatedStyle, styles.card_back, {opacity: frontOpacity, marginTop: cardMotion}]}/>
+      </Animated.View>  
 
-        <TouchableOpacity
-            style = {styles.buttonStyle}
-            onPress = {flipAnimation}>
+      <Animated.View style={[styles.newCardTextContainer, {opacity: viewOpacity}]}>
+            <Text style = {styles.newCardText}>{"Here is your card"}</Text>
+            <Text style = {styles.newCardText}>{"of the day"}</Text>
+      </Animated.View>
+        
+
+        {/* display this card animation when clicking the draw button */}
+            
+        {showDrawAnimation && (
+            
             <Animated.Image
             
-                source = {require('../assets/images/card_front.jpg')}
-                style = {[backAnimatedStyle, styles.card_front, {opacity: backOpacity, marginTop: cardMotion}]}/>
+            source = {currentImage}
+            style = {[frontAnimatedStyle, styles.card_back, {opacity: frontOpacity, marginTop: cardMotion}]}/>
 
-            <Animated.View style={[backAnimatedStyle, styles.text_container]}>
-               {/* Wrap the Text component in a View component and apply the back animation styles */}
-               {isVisible && (
+        )}
 
-                    <Text style={[styles.quoteText, {fontSize: 22, fontWeight: "bold", color: "#fba0b5"}]}>{today}</Text>
-                    )}
+        {showDrawAnimation && (
+        <TouchableOpacity
+        style = {styles.buttonStyle}
+        onPress = {flipAnimation}>
+        
+        <Animated.Image
+        
+            source = {require('../assets/images/card_front.jpg')}
+            style = {[backAnimatedStyle, styles.card_front, {opacity: backOpacity, marginTop: cardMotion}]}/>
 
-                    {/* display the quote more nicely */}
+        <Animated.View style={[backAnimatedStyle, styles.text_container]}>
+           {/* Wrap the Text component in a View component and apply the back animation styles */}
+           {isVisible && (
 
-                {isVisible && (                
-                    <View>
-                        {sentences.map((sentence) => (
-                            <Text style={[styles.quoteText, {top: counter += 20}]} key={sentence}>{sentence}</Text>
-
-                        ))}
-
-                    </View>
+                <Text style={[styles.quoteText, {fontSize: 22, fontWeight: "bold", color: "#fba0b5"}]}>{today}</Text>
                 )}
 
-                </Animated.View>
-            
-        </TouchableOpacity>
+                {/* display the quote more nicely */}
 
-        <Animated.View style = {[styles.drawButtonStyle, {opacity: drawButtonOpacity}]}>
-            <TouchableOpacity
-                activeOpacity={0.8}    
-                style = {styles.drawCardButton}
-                onPress = {runCardAnimation}>
-                                                                
-                <Text numberOfLines={1} style={styles.drawCardButtonText}>{"Draw a new card"}</Text>
-    
-            </TouchableOpacity>
-            
-        </Animated.View>
+            {isVisible && (                
+                <View>
+                    {sentences.map((sentence) => (
+                        <Text style={[styles.quoteText, {top: counter += 20}]} key={sentence}>{sentence}</Text>
+
+                    ))}
+
+                </View>
+            )}
+
+            </Animated.View>
+        
+    </TouchableOpacity>
+        )}
 
         </SafeAreaView>
         </ImageBackground>
@@ -235,10 +304,27 @@ const styles = StyleSheet.create({
         backfaceVisibility:"hidden"
     },
 
+    deck_container: {
+        flex: 1,
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'center',
+        alignItems: 'center',
+        top: 20,
+        bottom: height + 50,
+    },
+
+    card_deck: {  
+        width: 105,
+        height: 175,
+        margin: 10,
+        backgroundColor:"transparent",  
+    },
+
     card_back: {
         width: 330,
         height: 540,
-        bottom: height + 50,
+        bottom: height + 30,
         backgroundColor:"transparent",
         
     },
@@ -289,7 +375,7 @@ const styles = StyleSheet.create({
         position: "absolute",
         alignSelf: 'center',
         justifyContent: 'center',
-        bottom: 20,
+        bottom: 15,
     },
 
       drawCardButton: {
@@ -317,6 +403,22 @@ const styles = StyleSheet.create({
         letterSpacing: 0.25,
         color: 'white',
     }, 
+
+      newCardTextContainer: {
+            position: 'absolute',
+            zIndex: 1,
+            top: 30,
+            alignSelf: "center",
+        },
+
+      newCardText: {
+        alignSelf: "center",
+        fontSize: 24,
+        fontWeight: 'bold',
+        letterSpacing: 0.25,
+        color: 'white',
+
+    },
 
 })
     

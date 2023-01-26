@@ -4,21 +4,58 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {Text, StatusBar} from 'react-native'
 import { Audio } from 'expo-av';
+import { auth } from '../firebase';
 
 // Screens
 import HomeScreen from './screens/HomeScreen';
 import CardScreen from './screens/CardScreen';
 import AccountScreen from './screens/AccountScreen.js';
 
-//Screen names
-const homeName = "Home";
-const cardName = "Card";
-const accountName = "Account";
-
-const Tab = createBottomTabNavigator(); 
-
 function MainContainer() {
-        
+      //Screen names
+    const homeName = "Home";
+    const cardName = "Card";
+    const accountName = "Account";
+
+    const Tab = createBottomTabNavigator();
+    
+    // handle playing music
+    const [sound, setSound] = React.useState();
+
+    async function playSound() {
+        const { sound } = await Audio.Sound.createAsync(require('./assets/sound/relax1.mp3'));
+        setSound(sound);
+
+        sound.setOnPlaybackStatusUpdate(status => {
+          if (status.didJustFinish) {
+              playSound();
+          }
+      });
+
+        await sound.playAsync();
+
+     }
+
+     async function stopSound() {
+      try {
+        if (sound) {
+            await sound.stopAsync();
+        }
+    } catch (error) {
+        console.log(error);
+    }
+  }
+ 
+    React.useEffect(() => {
+         playSound();
+         return () => {
+            if (sound) {
+              sound.unloadAsync();
+            }
+         };
+     }, [])
+
+
   return (
     <>
     <StatusBar hidden /> 
