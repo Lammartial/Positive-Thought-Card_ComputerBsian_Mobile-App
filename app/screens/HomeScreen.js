@@ -60,6 +60,7 @@ function HomeScreen(){
     const navigation = useNavigation()
 
     const handleSignOut = () => {
+        
         auth
             .signOut()
             .then(() => {
