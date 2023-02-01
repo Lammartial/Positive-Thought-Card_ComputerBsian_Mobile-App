@@ -1,4 +1,4 @@
-import React, {useEffect} from "react";
+import React, { useEffect } from "react";
 import {
   View,
   TouchableOpacity,
@@ -11,17 +11,17 @@ import {
 } from "react-native";
 
 import { Block, Text, theme } from "galio-framework";
-import { Button } from "../../components"; 
-import { Images, argonTheme } from "../../constants";
+import { Button } from "../../components";
+import { Images, Theme } from "../../constants";
 import { HeaderHeight } from "../../constants/utils";
-import { useNavigation } from '@react-navigation/native';
-import {Audio} from 'expo-av'
+import { useNavigation } from "@react-navigation/native";
+import { Audio } from "expo-av";
 
 import { auth } from "../../firebase";
 import { db } from "../../firebase";
-import * as firebase from 'firebase';
+import * as firebase from "firebase";
 
-import * as ImagePicker from 'expo-image-picker';
+import * as ImagePicker from "expo-image-picker";
 
 const { width, height } = Dimensions.get("screen");
 
@@ -31,7 +31,7 @@ class AccountScreen extends React.Component {
   useNavigationInClass = () => {
     const navigation = useNavigation();
     return navigation;
-  }
+  };
 
   handleSignOut = async () => {
     const navigation = this.useNavigationInClass();
@@ -40,41 +40,40 @@ class AccountScreen extends React.Component {
       .signOut()
       .then(() => {
         // playSound();
-        navigation.replace("Welcome");      
+        navigation.replace("Welcome");
       })
       .catch((error) => alert(error.message));
-  }
+  };
 
   state = {
     hasGalleyPermission: null,
     image: null,
-  }
-  
+  };
+
   componentDidMount() {
     this.checkPermission();
   }
 
   checkPermission = async () => {
-    const galleryStatus = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    this.setState({ hasGalleryPermission: galleryStatus.status === 'granted' }); 
-  }
+    const galleryStatus =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
+    this.setState({ hasGalleryPermission: galleryStatus.status === "granted" });
+  };
 
   pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
-      aspect: [4,3],
-      quality:1,
+      aspect: [4, 3],
+      quality: 1,
     });
 
-    if (!result.canceled){
-      this.setState({ image: result.assets[0].uri })
-
+    if (!result.canceled) {
+      this.setState({ image: result.assets[0].uri });
     }
-  }
+  };
 
   render() {
-
     const { hasGalleryPermission, image } = this.state;
 
     return (
@@ -89,138 +88,134 @@ class AccountScreen extends React.Component {
               showsVerticalScrollIndicator={false}
               style={{ width, marginTop: "25%" }}
             >
-
               <Block flex style={styles.profileCard}>
                 <Block middle style={styles.avatarContainer}>
-
-                {/* signOut Icon */}
-                <TouchableOpacity 
+                  {/* signOut Icon */}
+                  <TouchableOpacity
                     activeOpacity={0.5}
-                    style = {{position: "absolute", left: 315, bottom: 20,}}
-                    onPress = {this.handleSignOut}>
-                <Image
-                    source={require('../assets/imgs/signOutIcon.png')}
-                    style={styles.signOutIcon}
-                  />
+                    style={{ position: "absolute", left: 300, bottom: 20 }}
+                    onPress={this.handleSignOut}
+                  >
+                    <Image
+                      source={require("../assets/imgs/signOutIcon.png")}
+                      style={styles.signOutIcon}
+                    />
+                  </TouchableOpacity>
 
-                </TouchableOpacity>
+                  <Text style={styles.signOutText}> Sign out</Text>
 
+                  {/* if user log in with guest account */}
 
-                 <Text style = {styles.signOutText}> Sign out</Text> 
-
-            {/* if user log in with guest account */}
-
-                {auth.currentUser.isAnonymous ? (
-                  <Image
-                    source={Images.ProfilePicture}
-                    style={styles.avatar}
-                  />
-                  ):(
-
-                    <TouchableOpacity activeOpacity={0.9} onPress={this.pickImage}>
+                  {auth.currentUser.isAnonymous ? (
+                    <Image
+                      source={Images.ProfilePicture}
+                      style={styles.avatar}
+                    />
+                  ) : (
+                    <TouchableOpacity
+                      activeOpacity={0.9}
+                      onPress={this.pickImage}
+                    >
                       <Image
-                      defaultSource={Images.ProfilePicture}
-                      source={{uri: image}}
-                      style={styles.avatar} 
+                        defaultSource={Images.ProfilePicture}
+                        source={{ uri: image }}
+                        style={styles.avatar}
                       />
 
                       <Image
-                        source={require('../assets/imgs/camera_icon.png')}
-                        style={styles.camera_icon} 
+                        source={require("../assets/imgs/camera_icon.png")}
+                        style={styles.camera_icon}
                       />
-
                     </TouchableOpacity>
-
                   )}
 
-                  {hasGalleryPermission === false && <Text> No access to Internal Storage</Text>}
-                
+                  {hasGalleryPermission === false && (
+                    <Text> No access to Internal Storage</Text>
+                  )}
                 </Block>
 
                 {/* username display */}
 
                 <Block flex>
                   <Block middle style={styles.nameInfo}>
-                  {auth.currentUser.isAnonymous && (
-                    <Text bold size={28} color="#32325D">
-                      Guest
-                    </Text>
-                  )}
+                    {auth.currentUser.isAnonymous && (
+                      <Text bold size={28} color="#32325D">
+                        Guest
+                      </Text>
+                    )}
 
-                  {!auth.currentUser.isAnonymous && (
-                    <Text bold size={28} color="#32325D">
-                      {auth.currentUser.displayName}
-                    </Text>
-                  )}
+                    {!auth.currentUser.isAnonymous && (
+                      <Text bold size={28} color="#32325D">
+                        {auth.currentUser.displayName}
+                      </Text>
+                    )}
                     <Text size={16} color="#32325D" style={{ marginTop: 10 }}>
                       Unknown
                     </Text>
                   </Block>
 
-
-                <Block style={styles.info}>
-                  <Block
-                    middle
-                    row
-                    space="evenly"
-                    style={{ marginTop: 20, paddingBottom: 24 }}
-                  >
-                    <Button
-                      small
-                      style={{ backgroundColor: argonTheme.COLORS.INFO }}
+                  <Block style={styles.info}>
+                    <Block
+                      middle
+                      row
+                      space="evenly"
+                      style={{ marginTop: 20, paddingBottom: 24 }}
                     >
-                      CONNECT
-                    </Button>
-                    <Button
-                      small
-                      style={{ backgroundColor: argonTheme.COLORS.DEFAULT }}
-                    >
-                      MESSAGE
-                    </Button>
+                      <Button
+                        small
+                        style={{ backgroundColor: Theme.COLORS.DEFAULT }}
+                      >
+                        CONNECT
+                      </Button>
+                      <Button
+                        small
+                        style={{ backgroundColor: Theme.COLORS.DEFAULT }}
+                      >
+                        MESSAGE
+                      </Button>
+                    </Block>
+                    <Block row space="between">
+                      <Block middle>
+                        <Text
+                          bold
+                          size={18}
+                          color="#525F7F"
+                          style={{ marginBottom: 4 }}
+                        >
+                          2K
+                        </Text>
+                        <Text size={12} color={Theme.COLORS.TEXT}>
+                          Orders
+                        </Text>
+                      </Block>
+                      <Block middle>
+                        <Text
+                          bold
+                          color="#525F7F"
+                          size={18}
+                          style={{ marginBottom: 4 }}
+                        >
+                          10
+                        </Text>
+                        <Text size={12} color={Theme.COLORS.TEXT}>
+                          Photos
+                        </Text>
+                      </Block>
+                      <Block middle>
+                        <Text
+                          bold
+                          color="#525F7F"
+                          size={18}
+                          style={{ marginBottom: 4 }}
+                        >
+                          89
+                        </Text>
+                        <Text size={12} color={Theme.COLORS.TEXT}>
+                          Comments
+                        </Text>
+                      </Block>
+                    </Block>
                   </Block>
-                  <Block row space="between">
-                    <Block middle>
-                      <Text
-                        bold
-                        size={18}
-                        color="#525F7F"
-                        style={{ marginBottom: 4 }}
-                      >
-                        2K
-                      </Text>
-                      <Text size={12} color={argonTheme.COLORS.TEXT}>
-                        Orders
-                      </Text>
-                    </Block>
-                    <Block middle>
-                      <Text
-                        bold
-                        color="#525F7F"
-                        size={18}
-                        style={{ marginBottom: 4 }}
-                      >
-                        10
-                      </Text>
-                      <Text size={12} color={argonTheme.COLORS.TEXT}>
-                        Photos
-                      </Text>
-                    </Block>
-                    <Block middle>
-                      <Text
-                        bold
-                        color="#525F7F"
-                        size={18}
-                        style={{ marginBottom: 4 }}
-                      >
-                        89
-                      </Text>
-                      <Text size={12} color={argonTheme.COLORS.TEXT}>
-                        Comments
-                      </Text>
-                    </Block>
-                  </Block>
-                </Block>
-
 
                   <Block middle style={{ marginTop: 30, marginBottom: 16 }}>
                     <Block style={styles.divider} />
@@ -343,7 +338,6 @@ const styles = StyleSheet.create({
   signOutIcon: {
     width: 30,
     height: 30,
-
   },
   signOutText: {
     color: "black",
@@ -351,7 +345,7 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontWeight: "bold",
     letterSpacing: 0.05,
-    left: 300,
+    left: 290,
     bottom: 2,
   },
 
