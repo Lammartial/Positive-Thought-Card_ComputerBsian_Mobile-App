@@ -655,13 +655,12 @@ const styles = StyleSheet.create({
     },
 
     creditText: {
-        alignSelf: "center",
+        alignSelf:'baseline',
         fontSize: 14,
         lineHeight: 21,
         fontWeight: 'bold',
         letterSpacing: 0.25,
-        color: 'white',
-        bottom: height/6,
+        bottom: height/3,
         color: 'orange'  //*2
     },
 
