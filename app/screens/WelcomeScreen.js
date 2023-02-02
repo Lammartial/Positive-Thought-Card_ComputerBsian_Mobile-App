@@ -356,11 +356,14 @@ function WelcomeScreen(props) {
 
             </Animated.View>
 
+        <View style={styles.bottomContainer}>
+            <Text numberOfLines={1} style={styles.creditText}> {"Author: Isabelle Constant and Roger Stephane"}</Text>
+        </View>
+
         {/* container for the remaining components of main welcome screen */}
         <View style={styles.bottomContainer}>
             <Animated.View style = {bottomAnimatedStyle}>  
                 <Text numberOfLines={1} style={styles.saveProgressText}> {"Sign up to save your progress!"}</Text>
-                <Text numberOfLines={1} style={styles.creditText}> {"Quotes author: Isabelle Constant and Roger Stephane"}</Text>
                 
                 <TouchableOpacity 
                     disabled = {isDisabled}   // state of button
@@ -655,8 +658,8 @@ const styles = StyleSheet.create({
     },
 
     creditText: {
-        alignSelf: "center",
-        fontSize: 14,
+        alignSelf:'center',
+        fontSize: 18,
         lineHeight: 21,
         fontWeight: 'bold',
         letterSpacing: 0.25,

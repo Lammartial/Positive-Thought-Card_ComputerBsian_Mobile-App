@@ -299,9 +299,10 @@ const styles = StyleSheet.create({
     text_container: {
         width: 330,
         height: 540,
-        bottom: height-height/4,
+        bottom: height-height/6,
         backgroundColor:"transparent",
-        backfaceVisibility:"hidden"
+        backfaceVisibility:"hidden",
+        alignSelf:'center'
     },
 
     deck_container: {
