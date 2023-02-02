@@ -9,18 +9,15 @@ import {
   ImageBackground,
   Platform,
 } from "react-native";
-
 import { Block, Text, theme } from "galio-framework";
 import { Button } from "../../components";
 import { Images, Theme } from "../../constants";
 import { HeaderHeight } from "../../constants/utils";
 import { useNavigation } from "@react-navigation/native";
 import { Audio } from "expo-av";
-
 import { auth } from "../../firebase";
 import { db } from "../../firebase";
 import * as firebase from "firebase";
-
 import * as ImagePicker from "expo-image-picker";
 
 const { width, height } = Dimensions.get("screen");
@@ -28,12 +25,30 @@ const { width, height } = Dimensions.get("screen");
 const thumbMeasure = (width - 48 - 32) / 3;
 
 function AccountScreen() {
-  const state = {
-    hasGalleyPermission: null,
-    image: null,
+  const [hasGalleryPermission, setHasGalleryPermission] = React.useState(false);
+  const [image, setImage] = React.useState(null);
+  const [sound, setSound] = React.useState();
+
+  const checkPermission = async () => {
+    const galleryStatus =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
+    setHasGalleryPermission({
+      hasGalleryPermission: galleryStatus.status === "granted",
+    });
   };
 
-  const [sound, setSound] = React.useState();
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setImage(result.uri);
+    }
+  };
 
   async function playSound() {
     const { sound } = await Audio.Sound.createAsync(
@@ -51,7 +66,6 @@ function AccountScreen() {
         }
       : undefined;
   }, [sound]);
-
   const navigation = useNavigation();
 
   const handleSignOut = () => {
@@ -63,31 +77,6 @@ function AccountScreen() {
       })
       .catch((error) => alert(error.message));
   };
-
-  const componentDidMount = () => {
-    checkPermission();
-  };
-
-  const checkPermission = async () => {
-    const galleryStatus =
-      await ImagePicker.requestMediaLibraryPermissionsAsync();
-    setState({ hasGalleryPermission: galleryStatus.status === "granted" });
-  };
-
-  const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
-
-    if (!result.canceled) {
-      this.setState({ image: result.assets[0].uri });
-    }
-  };
-
-  const { hasGalleryPermission, image } = state;
 
   return (
     <Block flex style={styles.profile}>
@@ -136,9 +125,7 @@ function AccountScreen() {
                   </TouchableOpacity>
                 )}
 
-                {hasGalleryPermission === false && (
-                  <Text> No access to Internal Storage</Text>
-                )}
+                {hasGalleryPermission === false && <Text></Text>}
               </Block>
 
               {/* username display */}
@@ -157,7 +144,7 @@ function AccountScreen() {
                     </Text>
                   )}
                   <Text size={16} color="#32325D" style={{ marginTop: 10 }}>
-                    Unknown
+                    VinUniversity 20-23
                   </Text>
                 </Block>
 
@@ -233,7 +220,16 @@ function AccountScreen() {
                     color="#525F7F"
                     style={{ textAlign: "center" }}
                   >
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit,
+                    The sun was shining brightly in the clear blue sky as Jane
+                    stepped outside of her house. She took a deep breath and
+                    smiled, feeling grateful for the warm weather and the
+                    opportunity to start fresh. She decided to take a walk in
+                    the park and enjoy the beauty of nature. As she walked, she
+                    thought about all the things she wanted to accomplish this
+                    year. She was determined to work hard and achieve her goals,
+                    no matter what it took. With a spring in her step and a
+                    positive attitude, she walked towards her future, ready to
+                    face whatever challenges lay ahead.
                   </Text>
                   <Button
                     color="transparent"
@@ -327,9 +323,9 @@ const styles = StyleSheet.create({
     marginTop: -80,
   },
   avatar: {
-    width: 124,
-    height: 124,
-    borderRadius: 62,
+    width: 140,
+    height: 140,
+    borderRadius: 70,
     borderWidth: 0,
   },
 
@@ -356,7 +352,7 @@ const styles = StyleSheet.create({
   },
 
   nameInfo: {
-    marginTop: 35,
+    marginTop: 15,
   },
   divider: {
     width: "90%",
