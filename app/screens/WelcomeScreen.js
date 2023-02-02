@@ -661,7 +661,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         letterSpacing: 0.25,
         color: 'white',
-        bottom: height/6,
+        bottom: height/ 6,
         color: 'orange'  //*2
     },
 
@@ -883,7 +883,7 @@ const styles = StyleSheet.create({
         lineHeight: 17,
         letterSpacing: 0.25,
         color: 'white',
-        bottom: 125,
+        bottom: 140,
     },
 
     checkBoxContainer: {
