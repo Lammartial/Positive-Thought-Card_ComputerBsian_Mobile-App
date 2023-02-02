@@ -664,7 +664,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         letterSpacing: 0.25,
         color: 'white',
-        bottom: height/ 6,
+        bottom: height/ 7,
         color: 'orange'  //*2
     },
 
