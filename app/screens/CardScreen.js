@@ -299,7 +299,7 @@ const styles = StyleSheet.create({
     text_container: {
         width: 330,
         height: 540,
-        bottom: height - 100,
+        bottom: height-height/4,
         backgroundColor:"transparent",
         backfaceVisibility:"hidden"
     },
@@ -324,14 +324,15 @@ const styles = StyleSheet.create({
     card_back: {
         width: 330,
         height: 540,
-        bottom: height + 30,
+        bottom: height + height/19,
+        alignItems: 'center',
         backgroundColor:"transparent",
         
     },
     card_front: {
         width: 330,
         height: 540,
-        bottom: height - 530,
+        bottom: height/3,
         backgroundColor:"transparent",
 
     },
