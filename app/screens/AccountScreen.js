@@ -223,13 +223,7 @@ function AccountScreen() {
                     The sun was shining brightly in the clear blue sky as Jane
                     stepped outside of her house. She took a deep breath and
                     smiled, feeling grateful for the warm weather and the
-                    opportunity to start fresh. She decided to take a walk in
-                    the park and enjoy the beauty of nature. As she walked, she
-                    thought about all the things she wanted to accomplish this
-                    year. She was determined to work hard and achieve her goals,
-                    no matter what it took. With a spring in her step and a
-                    positive attitude, she walked towards her future, ready to
-                    face whatever challenges lay ahead.
+                    opportunity to start fresh.
                   </Text>
                   <Button
                     color="transparent"

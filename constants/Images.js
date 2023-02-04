@@ -2,10 +2,6 @@
 const Onboarding = require("../app/assets/imgs/bg.png");
 const ProfileBackground = require("../app/assets/imgs/background.jpg");
 
-// const iOSLogo = require("../app/assets/imgs/ios.png");
-// const androidLogo = require("../app/assets/imgs/android.png");
-// internet imgs
-
 const ProfilePicture = require("../app/assets/imgs/guest_ava.jpg");
 
 const Viewed = [
