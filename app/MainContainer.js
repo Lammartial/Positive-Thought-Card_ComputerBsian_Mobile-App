@@ -13,7 +13,6 @@ import AccountScreen from './screens/AccountScreen.js';
 
 function MainContainer() {
       //Screen names
-    const homeName = "Home";
     const cardName = "Card";
     const accountName = "Account";
 
@@ -61,17 +60,13 @@ function MainContainer() {
     <StatusBar hidden /> 
 
       <Tab.Navigator
-        initialRouteName={homeName}
+        initialRouteName={cardName}
         screenOptions={({ route }) => ({
           tabBarIcon: ({ focused,color, size }) => {
             let iconName;
             let rn = route.name;
-
-            if (rn === homeName) {
-              iconName = focused ? 'home' : 'home-outline';
-              color = focused? '#2FB5E2' : 'grey';
-
-            } else if (rn === cardName) {
+                
+            if (rn === cardName) {
               iconName = focused ? 'card' : 'card-outline';
               color = focused ? '#8f00ff' : 'grey';
 
@@ -103,7 +98,6 @@ function MainContainer() {
 
         })}>
 
-        <Tab.Screen name={homeName} component={HomeScreen} options = {{headerShown: false}} />
         <Tab.Screen name={cardName} component={CardScreen} options = {{headerShown: false}} />
         <Tab.Screen name={accountName} component={AccountScreen} options = {{headerShown: false}} />
 
