@@ -4,30 +4,36 @@
     "slug": "PositiveThoughtCard",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./app/assets/images/icon.png",
+    "icon": "../Project/Positive-Thought-Card_ComputerBsian_Mobile-App/app/assets/images/icon.png",
+    "scheme": "com.positivethoughtcard.app",
     "userInterfaceStyle": "light",
     "splash": {
-      "image": "./app/assets/images/splash.png",
+      "image": "../Positive-Thought-Card_ComputerBsian_Mobile-App/app/assets/images/splash.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true
     },
     "android": {
+      "googleServicesFile": "../Positive-Thought-Card_ComputerBsian_Mobile-App/google-services.json",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "foregroundImage": "../Positive-Thought-Card_ComputerBsian_Mobile-App/app/assets/images/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
-      }
+      },
+      "package": "com.nero162.PositiveThoughtCard"
     },
     "web": {
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "../Positive-Thought-Card_ComputerBsian_Mobile-App/app/assets/images/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "a5d397ea-7738-4f2d-8ecd-e4bc748c5993"
+      }
     }
   }
 }

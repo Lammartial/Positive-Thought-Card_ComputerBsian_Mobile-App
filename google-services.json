@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "959167426323",
+    "project_id": "first-test-3d173",
+    "storage_bucket": "first-test-3d173.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:959167426323:android:8f6444aeaf05d203ef74e6",
+        "android_client_info": {
+          "package_name": "com.positivethoughtcard.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "959167426323-msucqigclmba9bo9gla7nr3qa8dbc723.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDUpXXhUJ5F354LWcFv-K4ZIOIRHXYTibg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "959167426323-msucqigclmba9bo9gla7nr3qa8dbc723.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
